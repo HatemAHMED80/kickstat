@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #08080d;
+  --bg2: #0e0e15;
+  --bg3: #13131d;
+  --bg4: #191926;
+  --border: #1a1a2a;
+  --border2: #272740;
+  --t1: #eaeaf2;
+  --t2: #8888a4;
+  --t3: #4e4e68;
+  --t4: #2e2e42;
+  --green: #00e87b;
+  --green-d: rgba(0,232,123,.12);
+  --green-dd: rgba(0,232,123,.06);
+  --red: #ff4466;
+  --red-d: rgba(255,68,102,.1);
+  --amber: #ffaa00;
+  --amber-d: rgba(255,170,0,.1);
+  --cyan: #00d4ff;
+  --cyan-d: rgba(0,212,255,.1);
+  --blue: #4488ff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 3px;
+}
+
+@layer components {
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Buttons */
+  .btn-green {
+    @apply font-mono text-[10px] px-3.5 py-1.5 rounded-md bg-green text-bg font-bold border-none cursor-pointer inline-flex items-center gap-1.5 transition-all duration-200;
+  }
+
+  .btn-green:hover {
+    box-shadow: 0 0 20px var(--green-d);
+  }
+
+  .btn-outline {
+    @apply font-mono text-[10px] px-3.5 py-1.5 rounded-md bg-transparent text-text-2 font-semibold border border-border cursor-pointer transition-all duration-200;
+  }
+
+  .btn-outline:hover {
+    @apply border-border-2 text-text-1;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-bg-3 rounded-lg border border-border p-4;
+  }
+
+  .card-gradient {
+    background: linear-gradient(145deg, var(--bg3), #10101a);
+    @apply border border-border rounded-xl overflow-hidden relative;
+  }
+
+  /* Section styling */
+  .section-header {
+    @apply text-center mb-12;
+  }
+
+  .section-overline {
+    @apply font-mono text-[9px] text-green tracking-[3px] uppercase mb-2.5;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-4xl font-extrabold tracking-tight leading-tight mb-3;
+  }
+
+  .section-subtitle {
+    @apply text-[15px] text-text-2 max-w-xl mx-auto leading-relaxed;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Risk badges */
+  .badge-safe {
+    @apply font-mono text-[8px] font-bold tracking-wider uppercase py-0.5 px-2 rounded text-green;
+    background: var(--green-d);
+  }
+
+  .badge-medium {
+    @apply font-mono text-[8px] font-bold tracking-wider uppercase py-0.5 px-2 rounded text-amber;
+    background: var(--amber-d);
+  }
+
+  .badge-risky {
+    @apply font-mono text-[8px] font-bold tracking-wider uppercase py-0.5 px-2 rounded text-red;
+    background: var(--red-d);
+  }
+
+  /* Reveal animation */
+  .reveal {
+    @apply opacity-0 translate-y-5 transition-all duration-500;
+  }
+
+  .reveal.visible {
+    @apply opacity-100 translate-y-0;
+  }
+}
