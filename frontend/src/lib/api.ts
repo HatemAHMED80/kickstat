@@ -201,3 +201,107 @@ export async function getCustomerPortalUrl() {
   const response = await api.get("/subscriptions/portal");
   return response.data;
 }
+
+// =============================================================================
+// Match Analysis (Dixon-Coles) Types
+// =============================================================================
+
+export interface MatchAnalysisTeam {
+  id: number;
+  name: string;
+  short_name: string | null;
+  logo_url: string | null;
+}
+
+export interface MatchAnalysisInfo {
+  id: number;
+  home_team: MatchAnalysisTeam;
+  away_team: MatchAnalysisTeam;
+  kickoff: string;
+  competition: string;
+  matchday: number | null;
+}
+
+export interface ExactScore {
+  score: string;
+  probability: number;
+}
+
+export interface EdgeInfo {
+  market: string;
+  market_display: string;
+  model_probability: number;
+  bookmaker_probability: number;
+  edge_percentage: number;
+  best_odds: number;
+  risk_level: string;
+  kelly_stake: number;
+  confidence: number;
+}
+
+export interface Recommendation {
+  market: string;
+  market_display: string;
+  edge: number;
+  odds: number;
+  stake: string;
+  risk: string;
+}
+
+export interface MatchAnalysisResponse {
+  match: MatchAnalysisInfo;
+  has_access: boolean;
+  analysis?: {
+    expected_goals: {
+      home: number;
+      away: number;
+      total: number;
+    };
+    probabilities: {
+      "1x2": {
+        home_win: number;
+        draw: number;
+        away_win: number;
+      };
+      over_under: {
+        "over_1.5": number;
+        "under_1.5": number;
+        "over_2.5": number;
+        "under_2.5": number;
+        "over_3.5": number;
+        "under_3.5": number;
+      };
+      btts: {
+        btts_yes: number;
+        btts_no: number;
+      };
+    };
+    exact_scores: ExactScore[];
+    asian_handicaps: Record<string, number>;
+    score_matrix: number[][];
+  };
+  edges?: EdgeInfo[];
+  odds?: {
+    bookmaker: string;
+    home_win: number | null;
+    draw: number | null;
+    away_win: number | null;
+    over_25: number | null;
+    under_25: number | null;
+    btts_yes: number | null;
+    btts_no: number | null;
+  };
+  recommendations?: Recommendation[];
+  preview?: {
+    best_edge: number;
+    edges_count: number;
+    expected_goals_total: number;
+  };
+  message?: string;
+}
+
+// Get full match analysis (Dixon-Coles)
+export async function getMatchAnalysis(matchId: number): Promise<MatchAnalysisResponse> {
+  const response = await api.get(`/odds/matches/${matchId}/analysis`);
+  return response.data;
+}

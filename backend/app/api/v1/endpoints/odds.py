@@ -12,9 +12,13 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.database import User, Match, EdgeCalculation, MatchOdds
+from app.core import get_settings
+from app.models.database import User, Match, EdgeCalculation, MatchOdds, Prediction
 from app.services.auth import get_current_user_optional, check_match_access
 from app.services.odds import get_edge_calculator
+from app.services.ml.dixon_coles import get_dixon_coles_model
+
+settings = get_settings()
 
 
 router = APIRouter()
@@ -256,6 +260,148 @@ async def get_match_edges(
             for e in edges
         ],
     }
+
+
+@router.get("/matches/{match_id}/analysis")
+async def get_match_analysis(
+    match_id: int,
+    db: Session = Depends(get_db),
+    user: Optional[User] = Depends(get_current_user_optional),
+):
+    """
+    Get complete Dixon-Coles analysis for a match.
+
+    Includes:
+    - Score matrix with probabilities
+    - All markets (1X2, O/U, BTTS, exact scores)
+    - Expected goals
+    - Edge calculations
+    - Recommended bets
+    """
+    # Check match exists
+    match = db.query(Match).filter(Match.id == match_id).first()
+    if not match:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Match not found",
+        )
+
+    # Get prediction
+    prediction = db.query(Prediction).filter(Prediction.match_id == match_id).first()
+
+    # Get edges
+    edges = (
+        db.query(EdgeCalculation)
+        .filter(EdgeCalculation.match_id == match_id)
+        .order_by(EdgeCalculation.edge_percentage.desc())
+        .all()
+    )
+
+    # Get odds
+    odds = db.query(MatchOdds).filter(MatchOdds.match_id == match_id).first()
+
+    # Get Dixon-Coles predictions
+    model = get_dixon_coles_model()
+    dc_predictions = model.predict_all_markets(
+        match.home_team.name,
+        match.away_team.name
+    )
+
+    # Check access - in development, allow all
+    is_dev = settings.environment == "development"
+    is_subscriber = (
+        user is not None
+        and user.subscription_status == "active"
+    )
+    has_access = is_dev or is_subscriber
+
+    # Build response
+    response = {
+        "match": {
+            "id": match.id,
+            "home_team": {
+                "id": match.home_team.id,
+                "name": match.home_team.name,
+                "short_name": match.home_team.short_name,
+                "logo_url": match.home_team.logo_url,
+            },
+            "away_team": {
+                "id": match.away_team.id,
+                "name": match.away_team.name,
+                "short_name": match.away_team.short_name,
+                "logo_url": match.away_team.logo_url,
+            },
+            "kickoff": match.kickoff.isoformat(),
+            "competition": match.competition.name if match.competition else "Ligue 1",
+            "matchday": match.matchday,
+        },
+        "has_access": has_access,
+    }
+
+    if has_access:
+        # Full analysis
+        response["analysis"] = {
+            "expected_goals": dc_predictions.get("expected_goals", {}),
+            "probabilities": {
+                "1x2": dc_predictions.get("1x2", {}),
+                "over_under": dc_predictions.get("over_under", {}),
+                "btts": dc_predictions.get("btts", {}),
+            },
+            "exact_scores": dc_predictions.get("exact_scores", [])[:10],
+            "asian_handicaps": dc_predictions.get("asian_handicap", {}),
+            "score_matrix": dc_predictions.get("score_matrix", []),
+        }
+
+        response["edges"] = [
+            {
+                "market": e.market,
+                "market_display": MARKET_NAMES.get(e.market, e.market),
+                "model_probability": round(e.model_probability * 100, 1),
+                "bookmaker_probability": round(e.bookmaker_probability * 100, 1),
+                "edge_percentage": round(e.edge_percentage, 1),
+                "best_odds": e.best_odds,
+                "risk_level": e.risk_level,
+                "kelly_stake": round(e.kelly_stake * 100, 1) if e.kelly_stake else 0,
+                "confidence": round(e.confidence * 100, 1),
+            }
+            for e in edges
+        ]
+
+        response["odds"] = {
+            "bookmaker": odds.bookmaker if odds else "N/A",
+            "home_win": odds.home_win_odds if odds else None,
+            "draw": odds.draw_odds if odds else None,
+            "away_win": odds.away_win_odds if odds else None,
+            "over_25": odds.over_25_odds if odds else None,
+            "under_25": odds.under_25_odds if odds else None,
+            "btts_yes": odds.btts_yes_odds if odds else None,
+            "btts_no": odds.btts_no_odds if odds else None,
+        }
+
+        # Recommended bets (edges > 5%)
+        response["recommendations"] = [
+            {
+                "market": e.market,
+                "market_display": MARKET_NAMES.get(e.market, e.market),
+                "edge": round(e.edge_percentage, 1),
+                "odds": e.best_odds,
+                "stake": f"{round(e.kelly_stake * 100, 1)}%" if e.kelly_stake else "1%",
+                "risk": e.risk_level,
+            }
+            for e in edges if e.edge_percentage >= 5
+        ]
+    else:
+        # Preview only
+        response["preview"] = {
+            "best_edge": round(edges[0].edge_percentage, 1) if edges else 0,
+            "edges_count": len(edges),
+            "expected_goals_total": round(
+                dc_predictions.get("expected_goals", {}).get("total", 2.5), 2
+            ),
+        }
+        response["message"] = "Abonnez-vous pour voir l'analyse complète"
+
+    return response
 
 
 @router.get("/matches/{match_id}/odds", response_model=list[MatchOddsResponse])

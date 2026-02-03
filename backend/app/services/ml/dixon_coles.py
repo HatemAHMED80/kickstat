@@ -414,40 +414,83 @@ class DixonColesModel:
         }
 
 
-# Pre-configured ratings for Ligue 1 teams (based on historical xG data)
+# Pre-configured ratings for Ligue 1 teams
+# These are updated from xG data in understat.py
 LIGUE1_RATINGS = {
-    'Paris Saint-Germain FC': {'attack': 1.85, 'defense': 0.65},
-    'Paris Saint-Germain': {'attack': 1.85, 'defense': 0.65},
-    'AS Monaco FC': {'attack': 1.35, 'defense': 0.85},
-    'AS Monaco': {'attack': 1.35, 'defense': 0.85},
-    'Olympique de Marseille': {'attack': 1.25, 'defense': 0.90},
-    'Olympique Marseille': {'attack': 1.25, 'defense': 0.90},
-    'Olympique Lyonnais': {'attack': 1.20, 'defense': 0.95},
-    'Olympique Lyon': {'attack': 1.20, 'defense': 0.95},
-    'LOSC Lille': {'attack': 1.10, 'defense': 0.88},
-    'Lille OSC': {'attack': 1.10, 'defense': 0.88},
-    'OGC Nice': {'attack': 1.05, 'defense': 0.92},
-    'Stade Rennais FC 1901': {'attack': 1.08, 'defense': 0.95},
-    'Stade Rennais': {'attack': 1.08, 'defense': 0.95},
-    'RC Lens': {'attack': 1.02, 'defense': 0.90},
-    'Racing Club de Lens': {'attack': 1.02, 'defense': 0.90},
-    'Stade Brestois 29': {'attack': 1.00, 'defense': 1.00},
-    'RC Strasbourg Alsace': {'attack': 0.95, 'defense': 1.05},
-    'Toulouse FC': {'attack': 0.92, 'defense': 1.02},
-    'FC Nantes': {'attack': 0.88, 'defense': 1.08},
-    'Montpellier HSC': {'attack': 0.90, 'defense': 1.15},
-    'Stade de Reims': {'attack': 0.85, 'defense': 0.98},
-    'AJ Auxerre': {'attack': 0.82, 'defense': 1.12},
-    'Angers SCO': {'attack': 0.80, 'defense': 1.10},
-    'Le Havre AC': {'attack': 0.78, 'defense': 1.15},
-    'AS Saint-Étienne': {'attack': 0.75, 'defense': 1.18},
+    # PSG variants
+    'Paris Saint-Germain FC': {'attack': 1.638, 'defense': 0.572},
+    'Paris Saint-Germain': {'attack': 1.638, 'defense': 0.572},
+    'Paris Saint Germain': {'attack': 1.638, 'defense': 0.572},
+    # Monaco variants
+    'AS Monaco FC': {'attack': 1.395, 'defense': 0.742},
+    'AS Monaco': {'attack': 1.395, 'defense': 0.742},
+    # Marseille variants
+    'Olympique de Marseille': {'attack': 1.331, 'defense': 0.866},
+    'Olympique Marseille': {'attack': 1.331, 'defense': 0.866},
+    'Marseille': {'attack': 1.331, 'defense': 0.866},
+    # Lyon variants
+    'Olympique Lyonnais': {'attack': 1.259, 'defense': 0.970},
+    'Olympique Lyon': {'attack': 1.259, 'defense': 0.970},
+    'Lyon': {'attack': 1.259, 'defense': 0.970},
+    # Lille variants
+    'LOSC Lille': {'attack': 1.156, 'defense': 0.731},
+    'Lille OSC': {'attack': 1.156, 'defense': 0.731},
+    'Lille': {'attack': 1.156, 'defense': 0.731},
+    # Nice
+    'OGC Nice': {'attack': 1.054, 'defense': 0.823},
+    'Nice': {'attack': 1.054, 'defense': 0.823},
+    # Lens
+    'RC Lens': {'attack': 1.001, 'defense': 0.882},
+    'Racing Club de Lens': {'attack': 1.001, 'defense': 0.882},
+    'Lens': {'attack': 1.001, 'defense': 0.882},
+    # Toulouse
+    'Toulouse FC': {'attack': 0.971, 'defense': 0.955},
+    'Toulouse': {'attack': 0.971, 'defense': 0.955},
+    # Rennes
+    'Stade Rennais FC 1901': {'attack': 0.960, 'defense': 1.145},
+    'Stade Rennais FC': {'attack': 0.960, 'defense': 1.145},
+    'Stade Rennais': {'attack': 0.960, 'defense': 1.145},
+    'Rennes': {'attack': 0.960, 'defense': 1.145},
+    # Strasbourg
+    'RC Strasbourg Alsace': {'attack': 0.944, 'defense': 1.060},
+    'RC Strasbourg': {'attack': 0.944, 'defense': 1.060},
+    'Strasbourg': {'attack': 0.944, 'defense': 1.060},
+    # Auxerre
+    'AJ Auxerre': {'attack': 0.914, 'defense': 1.095},
+    'Auxerre': {'attack': 0.914, 'defense': 1.095},
+    # Reims
+    'Stade de Reims': {'attack': 0.880, 'defense': 1.036},
+    'Reims': {'attack': 0.880, 'defense': 1.036},
+    # Brest
+    'Stade Brestois 29': {'attack': 0.865, 'defense': 0.932},
+    'Brest': {'attack': 0.865, 'defense': 0.932},
+    # Nantes
+    'FC Nantes': {'attack': 0.823, 'defense': 1.052},
+    'Nantes': {'attack': 0.823, 'defense': 1.052},
+    # Saint-Etienne
+    'AS Saint-Étienne': {'attack': 0.728, 'defense': 1.307},
+    'AS Saint-Etienne': {'attack': 0.728, 'defense': 1.307},
+    'Saint-Etienne': {'attack': 0.728, 'defense': 1.307},
+    # Montpellier
+    'Montpellier HSC': {'attack': 0.717, 'defense': 1.361},
+    'Montpellier': {'attack': 0.717, 'defense': 1.361},
+    # Angers
+    'Angers SCO': {'attack': 0.698, 'defense': 1.218},
+    'SCO Angers': {'attack': 0.698, 'defense': 1.218},
+    'Angers': {'attack': 0.698, 'defense': 1.218},
+    # Le Havre
+    'Le Havre AC': {'attack': 0.667, 'defense': 1.253},
+    'Le Havre': {'attack': 0.667, 'defense': 1.253},
+    # Metz (promotion/relegation)
     'FC Metz': {'attack': 0.80, 'defense': 1.12},
+    'Metz': {'attack': 0.80, 'defense': 1.12},
+    # Lorient (relegated but keeping for reference)
     'FC Lorient': {'attack': 0.82, 'defense': 1.08},
 }
 
 
 def get_dixon_coles_model() -> DixonColesModel:
-    """Get a pre-configured Dixon-Coles model with Ligue 1 ratings."""
+    """Get a pre-configured Dixon-Coles model with Ligue 1 ratings from xG data."""
     model = DixonColesModel()
     model.set_team_ratings(LIGUE1_RATINGS)
     return model

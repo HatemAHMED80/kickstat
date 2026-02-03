@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     api_football_key: str = ""
     api_football_host: str = "v3.football.api-sports.io"
     football_data_org_key: str = ""  # Free tier: Ligue 1, PL, La Liga, etc.
+    odds_api_key: str = ""  # The Odds API - https://the-odds-api.com/ (500 free/month)
     openweathermap_api_key: str = ""
 
     # ML
