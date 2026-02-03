@@ -23,6 +23,22 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database tables...")
     init_db()
 
+    # Auto-seed if database is empty (for Render's ephemeral filesystem)
+    from app.core.database import SessionLocal
+    from app.models.database import Team
+    db = SessionLocal()
+    try:
+        team_count = db.query(Team).count()
+        if team_count == 0:
+            logger.info("Database is empty, seeding with demo data...")
+            from scripts.seed_data import seed_database
+            seed_database()
+            logger.info("Database seeded successfully!")
+    except Exception as e:
+        logger.warning(f"Could not check/seed database: {e}")
+    finally:
+        db.close()
+
     yield
     logger.info("Shutting down Football Prediction System...")
 

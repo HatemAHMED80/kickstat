@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     api_v1_prefix: str = "/api/v1"
 
-    # Database
-    database_url: str = "postgresql://user:password@localhost:5432/football_predictions"
+    # Database (use SQLite by default for simplicity)
+    database_url: str = "sqlite:///./data/kickstat.db"
     redis_url: str = "redis://localhost:6379/0"
 
     # CORS (add frontend_url and common origins)
