@@ -73,30 +73,69 @@ export async function getStandings(competitionId: number) {
 // Kickstat Web App API Functions
 // =============================================================================
 
-// Edge/Opportunity types
-export interface Edge {
+// Edge/Opportunity types (matching backend response)
+export interface TeamInfo {
   id: number;
-  match_id: number;
+  name: string;
+  short_name: string | null;
+  logo_url: string | null;
+}
+
+export interface MatchInfo {
+  id: number;
+  home_team: TeamInfo;
+  away_team: TeamInfo;
+  kickoff: string;
+  competition_name: string | null;
+  matchday: number | null;
+}
+
+export interface OpportunityResponse {
+  id: number;
+  match: MatchInfo;
   market: string;
+  market_display: string;
   model_probability: number;
   bookmaker_probability: number;
   edge_percentage: number;
   best_odds: number;
   bookmaker_name: string;
-  risk_level: string;
-  kelly_stake: number;
+  risk_level: "safe" | "medium" | "risky";
   confidence: number;
+  kelly_stake: number | null;
 }
 
-export interface Opportunity {
-  match: Match;
-  prediction: Prediction;
-  edges: Edge[];
-  best_edge: Edge;
+export interface OpportunitiesListResponse {
+  opportunities: OpportunityResponse[];
+  total: number;
+  free_preview_count: number;
+}
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  full_name: string | null;
+  subscription_tier: string;
+  subscription_status: string;
+  telegram_connected: boolean;
+  telegram_alerts_enabled: boolean;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price_eur: number;
+  interval: string;
+  features: string[];
+}
+
+export interface PlansResponse {
+  plans: SubscriptionPlan[];
+  match_price_cents: number;
 }
 
 // Auth
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<UserResponse> {
   const response = await api.get("/auth/me");
   return response.data;
 }
@@ -117,7 +156,7 @@ export async function getOpportunities(params?: {
   risk_level?: string;
   competition_id?: number;
   limit?: number;
-}) {
+}): Promise<OpportunitiesListResponse> {
   const response = await api.get("/odds/opportunities", { params });
   return response.data;
 }
@@ -128,7 +167,7 @@ export async function getMatchDetails(matchId: number) {
 }
 
 // Subscriptions
-export async function getSubscriptionPlans() {
+export async function getSubscriptionPlans(): Promise<PlansResponse> {
   const response = await api.get("/subscriptions/plans");
   return response.data;
 }

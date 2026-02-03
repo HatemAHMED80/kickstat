@@ -1,124 +1,50 @@
 'use client';
 
-import { useState } from 'react';
-
-// Types
-interface Opportunity {
-  id: number;
-  match: string;
-  matchDate: string;
-  bet: string;
-  modelProb: number;
-  edge: number;
-  odds: number;
-  risk: 'safe' | 'medium' | 'risky';
-  type?: 'combo';
-  legs?: string[];
-}
-
-// Mock data - Replace with API calls
-const MOCK_OPPORTUNITIES: Opportunity[] = [
-  {
-    id: 1,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'Victoire du PSG',
-    modelProb: 62,
-    edge: 13,
-    odds: 2.04,
-    risk: 'safe',
-  },
-  {
-    id: 2,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'Plus de 1.5 buts',
-    modelProb: 81,
-    edge: 7,
-    odds: 1.35,
-    risk: 'safe',
-  },
-  {
-    id: 3,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'Plus de 9.5 corners',
-    modelProb: 64,
-    edge: 9,
-    odds: 1.82,
-    risk: 'safe',
-  },
-  {
-    id: 4,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'PSG mène à la mi-temps et gagne',
-    modelProb: 41,
-    edge: 9,
-    odds: 3.13,
-    risk: 'medium',
-  },
-  {
-    id: 5,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'Gonçalo Ramos marque',
-    modelProb: 42,
-    edge: 8,
-    odds: 2.90,
-    risk: 'medium',
-  },
-  {
-    id: 6,
-    match: 'Lens vs Lille',
-    matchDate: 'Sam. 19h',
-    bet: 'Match nul dans le derby',
-    modelProb: 28,
-    edge: 7,
-    odds: 4.75,
-    risk: 'medium',
-  },
-  {
-    id: 7,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'PSG gagne + Plus de 1.5 buts',
-    modelProb: 56,
-    edge: 16,
-    odds: 2.50,
-    risk: 'safe',
-    type: 'combo',
-    legs: ['Victoire PSG · 62%', 'Over 1.5 · 81%'],
-  },
-  {
-    id: 8,
-    match: 'PSG vs OM',
-    matchDate: 'Sam. 21h',
-    bet: 'PSG -1 + Over 2.5 + Ramos + BTTS Non',
-    modelProb: 5.8,
-    edge: 18,
-    odds: 42.5,
-    risk: 'risky',
-    type: 'combo',
-    legs: ['PSG -1 · 39%', 'Over 2.5 · 58%', 'Ramos BM · 42%', 'BTTS Non · 53%'],
-  },
-];
+import { useState, useEffect } from 'react';
+import { getOpportunities, OpportunityResponse } from '@/lib/api';
 
 type RiskFilter = 'all' | 'safe' | 'medium' | 'risky';
 
 export default function DashboardPage() {
   const [filter, setFilter] = useState<RiskFilter>('all');
+  const [opportunities, setOpportunities] = useState<OpportunityResponse[]>([]);
+  const [total, setTotal] = useState(0);
+  const [freePreviewCount, setFreePreviewCount] = useState(3);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredOpps = filter === 'all'
-    ? MOCK_OPPORTUNITIES
-    : MOCK_OPPORTUNITIES.filter(o => o.risk === filter);
+  useEffect(() => {
+    async function fetchOpportunities() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getOpportunities({
+          min_edge: 5,
+          risk_level: filter === 'all' ? undefined : filter,
+          limit: 20,
+        });
+        setOpportunities(data.opportunities);
+        setTotal(data.total);
+        setFreePreviewCount(data.free_preview_count);
+      } catch (err) {
+        console.error('Failed to fetch opportunities:', err);
+        setError('Impossible de charger les opportunités');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOpportunities();
+  }, [filter]);
 
   const counts = {
-    all: MOCK_OPPORTUNITIES.length,
-    safe: MOCK_OPPORTUNITIES.filter(o => o.risk === 'safe').length,
-    medium: MOCK_OPPORTUNITIES.filter(o => o.risk === 'medium').length,
-    risky: MOCK_OPPORTUNITIES.filter(o => o.risk === 'risky').length,
+    all: total,
+    safe: opportunities.filter(o => o.risk_level === 'safe').length,
+    medium: opportunities.filter(o => o.risk_level === 'medium').length,
+    risky: opportunities.filter(o => o.risk_level === 'risky').length,
   };
+
+  const lockedCount = total - opportunities.length;
 
   return (
     <div>
@@ -126,7 +52,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-[12px] font-semibold text-text-2 tracking-wider uppercase flex items-center gap-[7px]">
           <span className="w-[3px] h-3 bg-green rounded" />
-          Meilleures opportunités — J21
+          Meilleures opportunités
         </h2>
         <div className="flex gap-[3px]">
           <TabButton active>Ligue 1</TabButton>
@@ -170,25 +96,63 @@ export default function DashboardPage() {
         </FilterButton>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="flex flex-col gap-1.5 mb-7">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-bg-3 border border-border rounded-[10px] h-32 animate-pulse"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && !loading && (
+        <div className="bg-red-dark border border-red rounded-[10px] p-4 mb-7 text-center">
+          <span className="text-red font-mono text-sm">{error}</span>
+          <button
+            onClick={() => window.location.reload()}
+            className="ml-3 text-text-2 underline text-sm"
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && opportunities.length === 0 && (
+        <div className="bg-bg-3 border border-border rounded-[10px] p-8 mb-7 text-center">
+          <span className="font-mono text-sm text-text-2">
+            Aucune opportunité disponible pour le moment
+          </span>
+        </div>
+      )}
+
       {/* Opportunities list */}
-      <div className="flex flex-col gap-1.5 mb-7">
-        {filteredOpps.map((opp, idx) => (
-          <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
-        ))}
-      </div>
+      {!loading && !error && opportunities.length > 0 && (
+        <div className="flex flex-col gap-1.5 mb-7">
+          {opportunities.map((opp, idx) => (
+            <OpportunityCard key={opp.id} opportunity={opp} index={idx} />
+          ))}
+        </div>
+      )}
 
       {/* Locked banner */}
-      <div className="bg-bg-3 border border-border rounded-[10px] py-3.5 px-[18px] flex items-center justify-center gap-2.5 flex-wrap">
-        <span className="font-mono text-[11px] text-text-2">
-          🔒 6 opportunités supplémentaires
-        </span>
-        <button className="font-mono text-[10px] px-3.5 py-1.5 rounded bg-green text-bg font-semibold hover:shadow-[0_0_14px_rgba(0,232,123,0.2)] transition-all">
-          9,99€/mois → Tout voir
-        </button>
-        <button className="font-mono text-[10px] px-3.5 py-1.5 rounded bg-transparent text-text-2 font-semibold border border-border hover:border-border-2 hover:text-text-1 transition-all">
-          0,99€ par match
-        </button>
-      </div>
+      {lockedCount > 0 && (
+        <div className="bg-bg-3 border border-border rounded-[10px] py-3.5 px-[18px] flex items-center justify-center gap-2.5 flex-wrap">
+          <span className="font-mono text-[11px] text-text-2">
+            🔒 {lockedCount} opportunités supplémentaires
+          </span>
+          <button className="font-mono text-[10px] px-3.5 py-1.5 rounded bg-green text-bg font-semibold hover:shadow-[0_0_14px_rgba(0,232,123,0.2)] transition-all">
+            9,99€/mois → Tout voir
+          </button>
+          <button className="font-mono text-[10px] px-3.5 py-1.5 rounded bg-transparent text-text-2 font-semibold border border-border hover:border-border-2 hover:text-text-1 transition-all">
+            0,99€ par match
+          </button>
+        </div>
+      )}
 
       {/* History section */}
       <div className="mt-7">
@@ -314,19 +278,30 @@ function FilterButton({
   );
 }
 
-function OpportunityCard({ opportunity: opp, index }: { opportunity: Opportunity; index: number }) {
+function OpportunityCard({ opportunity: opp, index }: { opportunity: OpportunityResponse; index: number }) {
   const riskColors = {
     safe: { text: 'text-green', bg: 'bg-green-dark', border: 'border-l-green' },
     medium: { text: 'text-amber', bg: 'bg-amber-dark', border: 'border-l-amber' },
     risky: { text: 'text-red', bg: 'bg-red-dark', border: 'border-l-red' },
   };
 
-  const colors = riskColors[opp.risk];
+  const colors = riskColors[opp.risk_level];
   const confFillColors = {
     safe: 'bg-green',
     medium: 'bg-amber',
     risky: 'bg-red',
   };
+
+  // Format date
+  const kickoffDate = new Date(opp.match.kickoff);
+  const dateStr = kickoffDate.toLocaleDateString('fr-FR', {
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // Match display
+  const matchDisplay = `${opp.match.home_team.name} vs ${opp.match.away_team.name}`;
 
   return (
     <div
@@ -339,21 +314,21 @@ function OpportunityCard({ opportunity: opp, index }: { opportunity: Opportunity
           {/* Top row */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`font-mono text-[8px] font-bold tracking-wider uppercase py-0.5 px-[7px] rounded ${colors.text} ${colors.bg}`}>
-              {opp.risk === 'safe' ? 'SÛR' : opp.risk === 'medium' ? 'MOYEN' : 'RISQUÉ'}
+              {opp.risk_level === 'safe' ? 'SÛR' : opp.risk_level === 'medium' ? 'MOYEN' : 'RISQUÉ'}
             </span>
-            {opp.type === 'combo' && (
+            {opp.match.competition_name && (
               <span className="font-mono text-[8px] text-text-3 bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 rounded">
-                Combiné
+                {opp.match.competition_name}
               </span>
             )}
             <span className="font-mono text-[9px] text-text-3 tracking-wide">
-              {opp.match} · {opp.matchDate}
+              {matchDisplay} · {dateStr}
             </span>
           </div>
 
           {/* Bet description */}
           <div className="text-[15px] font-bold text-text-1 tracking-tight leading-snug">
-            {opp.bet}
+            {opp.market_display}
           </div>
 
           {/* Confidence bar */}
@@ -363,12 +338,12 @@ function OpportunityCard({ opportunity: opp, index }: { opportunity: Opportunity
             </span>
             <div className="flex-1 max-w-[180px] h-1.5 bg-border rounded overflow-hidden">
               <div
-                className={`h-full rounded transition-all duration-500 ${confFillColors[opp.risk]}`}
-                style={{ width: `${opp.modelProb}%` }}
+                className={`h-full rounded transition-all duration-500 ${confFillColors[opp.risk_level]}`}
+                style={{ width: `${opp.model_probability * 100}%` }}
               />
             </div>
             <span className={`font-mono text-[11px] font-semibold min-w-[32px] ${colors.text}`}>
-              {opp.modelProb}%
+              {(opp.model_probability * 100).toFixed(0)}%
             </span>
           </div>
 
@@ -383,36 +358,34 @@ function OpportunityCard({ opportunity: opp, index }: { opportunity: Opportunity
             <div className="flex-1 max-w-[180px] h-[3px] bg-border rounded overflow-hidden">
               <div
                 className="h-full rounded bg-green opacity-50"
-                style={{ width: `${Math.min(opp.edge * 5, 100)}%` }}
+                style={{ width: `${Math.min(opp.edge_percentage * 5, 100)}%` }}
               />
             </div>
             <span className="font-mono text-[10.5px] font-semibold text-green">
-              +{opp.edge}%
+              +{opp.edge_percentage.toFixed(1)}%
             </span>
           </div>
 
-          {/* Combo legs */}
-          {opp.legs && (
-            <div className="flex flex-wrap gap-1 mt-0.5">
-              {opp.legs.map((leg, i) => (
-                <span
-                  key={i}
-                  className="font-mono text-[9px] text-text-2 bg-[rgba(255,255,255,0.025)] border border-border rounded px-[7px] py-0.5"
-                >
-                  {leg}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Bookmaker info */}
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="font-mono text-[8px] text-text-3">
+              via {opp.bookmaker_name}
+            </span>
+            {opp.kelly_stake && (
+              <span className="font-mono text-[8px] text-text-3 bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 rounded">
+                Kelly: {(opp.kelly_stake * 100).toFixed(1)}%
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Right side - Odds */}
         <div className="flex flex-col items-center justify-center min-w-[80px] py-2 px-3 bg-[rgba(255,255,255,0.015)] rounded-lg border border-border">
           <span className="font-mono text-[7.5px] text-text-3 uppercase tracking-[1.2px] mb-0.5">
-            {opp.type === 'combo' ? 'Cote combinée' : 'Cote'}
+            Cote
           </span>
           <span className="font-mono text-[24px] font-bold text-cyan leading-none">
-            {opp.odds}
+            {opp.best_odds.toFixed(2)}
           </span>
         </div>
       </div>
