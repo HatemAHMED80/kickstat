@@ -112,11 +112,12 @@ def sync_fixtures():
         logger.info(f"API Status: {status}")
 
         # Get or create Ligue 1 competition
-        # Use current season based on date (season starts in August)
+        # API-Football free plan only supports seasons 2022-2024
+        # Using 2024 season for testing with real data
         from datetime import date
         current_date = date.today()
-        current_season = current_date.year if current_date.month >= 8 else current_date.year - 1
-        logger.info(f"Using season: {current_season}")
+        current_season = 2024  # Free plan limitation
+        logger.info(f"Using season: {current_season} (free plan)")
 
         competition = db.query(Competition).filter(Competition.api_id == 61).first()
         if not competition:
@@ -163,16 +164,19 @@ def sync_fixtures():
             db.commit()
             logger.info(f"Synced {len(api_teams)} teams")
 
-        # Fetch upcoming fixtures using date range (free plan compatible)
-        logger.info("Fetching upcoming Ligue 1 fixtures...")
-        today = current_date
-        date_to = today + timedelta(days=14)  # Next 2 weeks
+        # Fetch fixtures from season 2024 (free plan compatible)
+        # Using end of season dates (May 2025) for real match data
+        logger.info("Fetching Ligue 1 fixtures from season 2024...")
+
+        # Get last matchdays of 2024 season
+        fixture_date_from = date(2025, 5, 1)
+        fixture_date_to = date(2025, 5, 25)
 
         fixtures = api.get_fixtures(
             league_id=61,
             season=current_season,
-            date_from=today,
-            date_to=date_to,
+            date_from=fixture_date_from,
+            date_to=fixture_date_to,
         )
 
         matches_created = 0
@@ -200,9 +204,19 @@ def sync_fixtures():
                 logger.warning(f"Teams not found for fixture {fixture_id}")
                 continue
 
-            # Parse kickoff time
+            # Parse kickoff time and adjust to future dates for demo
             kickoff_str = fixture_info.get("date")
-            kickoff = datetime.fromisoformat(kickoff_str.replace("Z", "+00:00"))
+            original_kickoff = datetime.fromisoformat(kickoff_str.replace("Z", "+00:00"))
+
+            # Shift dates to future for demo (keep time, change to next weeks)
+            days_offset = (matches_created % 14) + 1  # Spread over 2 weeks
+            demo_kickoff = datetime.now() + timedelta(days=days_offset)
+            demo_kickoff = demo_kickoff.replace(
+                hour=original_kickoff.hour,
+                minute=original_kickoff.minute,
+                second=0,
+                microsecond=0
+            )
 
             # Create match
             match = Match(
@@ -210,7 +224,7 @@ def sync_fixtures():
                 home_team_id=home_team.id,
                 away_team_id=away_team.id,
                 competition_id=competition.id,
-                kickoff=kickoff,
+                kickoff=demo_kickoff,
                 matchday=fixture.get("league", {}).get("round", "").split(" - ")[-1] if fixture.get("league", {}).get("round") else None,
                 status="scheduled",
             )
