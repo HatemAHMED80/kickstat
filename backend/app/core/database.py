@@ -12,16 +12,21 @@ from app.models.database import Base
 
 settings = get_settings()
 
+# Fix Render's postgres:// URL to postgresql:// (required by SQLAlchemy 2.x)
+database_url = settings.database_url
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
 # Create engine
-if settings.database_url.startswith("sqlite"):
+if database_url.startswith("sqlite"):
     engine = create_engine(
-        settings.database_url,
+        database_url,
         connect_args={"check_same_thread": False},
         echo=settings.debug,
     )
 else:
     engine = create_engine(
-        settings.database_url,
+        database_url,
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
