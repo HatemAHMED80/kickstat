@@ -27,8 +27,12 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://user:password@localhost:5432/football_predictions"
     redis_url: str = "redis://localhost:6379/0"
 
-    # CORS
-    cors_origins: List[str] = ["http://localhost:3000"]
+    # CORS (add frontend_url and common origins)
+    cors_origins: List[str] = [
+        "http://localhost:3000",
+        "https://kickstat.vercel.app",
+        "https://*.vercel.app",
+    ]
 
     # API Keys
     api_football_key: str = ""

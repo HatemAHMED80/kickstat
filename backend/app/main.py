@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from app.core import get_settings
+from app.core import get_settings, init_db
 from app.api.v1 import router as api_v1_router
 
 settings = get_settings()
@@ -18,6 +18,11 @@ async def lifespan(app: FastAPI):
     """Application lifespan events."""
     logger.info("Starting Football Prediction System...")
     logger.info(f"Environment: {settings.environment}")
+
+    # Initialize database tables
+    logger.info("Initializing database tables...")
+    init_db()
+
     yield
     logger.info("Shutting down Football Prediction System...")
 
@@ -48,3 +53,21 @@ app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "version": "0.1.0"}
+
+
+@app.post("/admin/seed")
+async def seed_database(secret: str):
+    """
+    Seed the database with demo data.
+    Requires secret key for protection.
+    """
+    if secret != settings.secret_key:
+        return {"error": "Invalid secret key"}
+
+    try:
+        from scripts.seed_data import seed_database as run_seed
+        run_seed()
+        return {"status": "success", "message": "Database seeded successfully"}
+    except Exception as e:
+        logger.error(f"Seed failed: {e}")
+        return {"status": "error", "message": str(e)}
