@@ -7,6 +7,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
     ? "https://kickstat-api.onrender.com"
     : "http://localhost:8000");
 
+console.log("[API] NODE_ENV:", process.env.NODE_ENV);
+console.log("[API] NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+console.log("[API] Using API_BASE_URL:", API_BASE_URL);
+
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
   headers: {

@@ -15,6 +15,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchOpportunities() {
+      console.log("[Dashboard] Fetching opportunities...");
       try {
         setLoading(true);
         setError(null);
@@ -23,11 +24,12 @@ export default function DashboardPage() {
           risk_level: filter === 'all' ? undefined : filter,
           limit: 20,
         });
+        console.log("[Dashboard] Got data:", data);
         setOpportunities(data.opportunities);
         setTotal(data.total);
         setFreePreviewCount(data.free_preview_count);
       } catch (err) {
-        console.error('Failed to fetch opportunities:', err);
+        console.error('[Dashboard] Failed to fetch opportunities:', err);
         setError('Impossible de charger les opportunités');
       } finally {
         setLoading(false);
