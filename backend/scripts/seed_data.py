@@ -284,12 +284,12 @@ def seed_database():
             elo_diff = abs(home_team.elo_rating - away_team.elo_rating)
             confidence = min(0.9, 0.5 + elo_diff / 500)
 
-            # Create Prediction
+            # Create Prediction (probabilities stored as 0-100)
             prediction = Prediction(
                 match_id=match.id,
-                home_win_prob=probs_1x2["home_win"],
-                draw_prob=probs_1x2["draw"],
-                away_win_prob=probs_1x2["away_win"],
+                home_win_prob=probs_1x2["home_win"] * 100,
+                draw_prob=probs_1x2["draw"] * 100,
+                away_win_prob=probs_1x2["away_win"] * 100,
                 confidence=confidence,
                 model_version="v1.0-elo",
             )
