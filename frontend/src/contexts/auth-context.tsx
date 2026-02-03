@@ -32,51 +32,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = getSupabase();
 
   const fetchUserProfile = async (supabaseUser: User, accessToken: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+    // Use Supabase user info directly (no backend dependency)
+    setUser({
+      id: supabaseUser.id,
+      email: supabaseUser.email || '',
+      fullName: supabaseUser.user_metadata?.full_name,
+      subscriptionTier: 'free',
+      subscriptionStatus: 'inactive',
+      telegramConnected: false,
+      telegramAlertsEnabled: false,
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser({
-          id: data.id,
-          email: data.email,
-          fullName: data.full_name,
-          subscriptionTier: data.subscription_tier,
-          subscriptionStatus: data.subscription_status,
-          telegramConnected: data.telegram_connected,
-          telegramAlertsEnabled: data.telegram_alerts_enabled,
-        });
-      } else {
-        // Fallback to basic Supabase user info
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          fullName: supabaseUser.user_metadata?.full_name,
-          subscriptionTier: 'free',
-          subscriptionStatus: 'inactive',
-          telegramConnected: false,
-          telegramAlertsEnabled: false,
-        });
+    // Try to fetch extended profile from backend (non-blocking)
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            signal: controller.signal,
+          }
+        );
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser({
+            id: data.id,
+            email: data.email,
+            fullName: data.full_name,
+            subscriptionTier: data.subscription_tier,
+            subscriptionStatus: data.subscription_status,
+            telegramConnected: data.telegram_connected,
+            telegramAlertsEnabled: data.telegram_alerts_enabled,
+          });
+        }
+      } catch (error) {
+        // Backend not available, using Supabase data only
+        console.log('Backend not available, using Supabase auth only');
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      // Fallback to basic info
-      setUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        fullName: supabaseUser.user_metadata?.full_name,
-        subscriptionTier: 'free',
-        subscriptionStatus: 'inactive',
-        telegramConnected: false,
-        telegramAlertsEnabled: false,
-      });
     }
   };
 
