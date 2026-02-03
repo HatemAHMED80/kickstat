@@ -152,12 +152,17 @@ def sync_fixtures():
             db.commit()
             logger.info(f"Synced {len(api_teams)} teams")
 
-        # Fetch upcoming fixtures
+        # Fetch upcoming fixtures using date range (free plan compatible)
         logger.info("Fetching upcoming Ligue 1 fixtures...")
+        from datetime import date
+        today = date.today()
+        date_to = today + timedelta(days=14)  # Next 2 weeks
+
         fixtures = api.get_fixtures(
             league_id=61,
             season=2024,
-            next_n=20,  # Next 20 matches
+            date_from=today,
+            date_to=date_to,
         )
 
         matches_created = 0
