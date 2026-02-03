@@ -112,6 +112,12 @@ def sync_fixtures():
         logger.info(f"API Status: {status}")
 
         # Get or create Ligue 1 competition
+        # Use current season based on date (season starts in August)
+        from datetime import date
+        current_date = date.today()
+        current_season = current_date.year if current_date.month >= 8 else current_date.year - 1
+        logger.info(f"Using season: {current_season}")
+
         competition = db.query(Competition).filter(Competition.api_id == 61).first()
         if not competition:
             competition = Competition(
@@ -120,18 +126,23 @@ def sync_fixtures():
                 short_name="L1",
                 country="France",
                 type="league",
-                season=2024,
+                season=current_season,
                 logo_url="https://media.api-sports.io/football/leagues/61.png"
             )
             db.add(competition)
             db.commit()
             db.refresh(competition)
+        else:
+            # Update season if changed
+            if competition.season != current_season:
+                competition.season = current_season
+                db.commit()
 
         # Fetch teams if needed
         existing_teams = db.query(Team).filter(Team.api_id.isnot(None)).count()
         if existing_teams < 18:
             logger.info("Fetching Ligue 1 teams...")
-            api_teams = api.get_teams(league_id=61, season=2024)
+            api_teams = api.get_teams(league_id=61, season=current_season)
 
             for team_data in api_teams:
                 team_info = team_data.get("team", {})
@@ -154,13 +165,12 @@ def sync_fixtures():
 
         # Fetch upcoming fixtures using date range (free plan compatible)
         logger.info("Fetching upcoming Ligue 1 fixtures...")
-        from datetime import date
-        today = date.today()
+        today = current_date
         date_to = today + timedelta(days=14)  # Next 2 weeks
 
         fixtures = api.get_fixtures(
             league_id=61,
-            season=2024,
+            season=current_season,
             date_from=today,
             date_to=date_to,
         )
