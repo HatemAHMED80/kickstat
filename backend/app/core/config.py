@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     # API Keys
     api_football_key: str = ""
     api_football_host: str = "v3.football.api-sports.io"
+    football_data_org_key: str = ""  # Free tier: Ligue 1, PL, La Liga, etc.
     openweathermap_api_key: str = ""
 
     # ML
