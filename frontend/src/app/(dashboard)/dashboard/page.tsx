@@ -294,12 +294,13 @@ function OpportunityCard({ opportunity: opp, index }: { opportunity: Opportunity
     risky: 'bg-red',
   };
 
-  // Format date
-  const kickoffDate = new Date(opp.match.kickoff);
+  // Format date - kickoff is UTC, display in Paris timezone
+  const kickoffDate = new Date(opp.match.kickoff + 'Z'); // Ensure UTC interpretation
   const dateStr = kickoffDate.toLocaleDateString('fr-FR', {
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Paris',
   });
 
   // Match display
