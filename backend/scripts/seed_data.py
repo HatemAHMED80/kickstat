@@ -240,11 +240,11 @@ def seed_database():
 
         # Create matches for 2 matchdays
         for matchday in [21, 22]:
-            # Determine kickoff times
+            # Determine kickoff times (use UTC to match the edge calculator filter)
             if matchday == 21:
-                base_date = datetime.now() + timedelta(days=2)
+                base_date = datetime.utcnow() + timedelta(days=2)
             else:
-                base_date = datetime.now() + timedelta(days=9)
+                base_date = datetime.utcnow() + timedelta(days=9)
 
             # Create 9 matches per matchday
             for i in range(0, 18, 2):
