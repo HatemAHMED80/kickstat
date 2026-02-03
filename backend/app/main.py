@@ -88,3 +88,21 @@ async def seed_database(secret: str):
     except Exception as e:
         logger.error(f"Seed failed: {e}")
         return {"status": "error", "message": str(e)}
+
+
+@app.post("/admin/sync")
+async def sync_real_data(secret: str):
+    """
+    Sync real data from API-Football.
+    Fetches upcoming Ligue 1 fixtures and odds.
+    """
+    if secret != settings.secret_key:
+        return {"error": "Invalid secret key"}
+
+    try:
+        from scripts.sync_real_data import sync_fixtures
+        result = sync_fixtures()
+        return {"status": "success", **result}
+    except Exception as e:
+        logger.error(f"Sync failed: {e}")
+        return {"status": "error", "message": str(e)}
