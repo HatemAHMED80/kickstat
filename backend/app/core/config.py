@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     cors_origins: List[str] = [
         "http://localhost:3000",
         "https://kickstat.vercel.app",
+        "https://frontend-beryl-eight-83.vercel.app",
         "https://*.vercel.app",
     ]
 
