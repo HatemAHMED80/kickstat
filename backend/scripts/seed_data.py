@@ -116,11 +116,22 @@ def calculate_goals_probs(home_elo: float, away_elo: float) -> dict:
     }
 
 
-def prob_to_odds(prob: float, margin: float = 0.05) -> float:
-    """Convert probability to decimal odds with bookmaker margin."""
+def prob_to_odds(prob: float, margin: float = 0.05, variance: float = 0.0) -> float:
+    """
+    Convert probability to decimal odds with bookmaker margin and variance.
+
+    Args:
+        prob: True probability (0-1)
+        margin: Bookmaker margin (positive = house edge)
+        variance: Random variance to simulate bookmaker mispricing (-/+ means under/overestimate)
+    """
     if prob <= 0:
         return 50.0
-    implied = prob * (1 + margin)
+    # Apply variance first (simulates bookmaker's probability estimation error)
+    adjusted_prob = prob + variance
+    adjusted_prob = max(0.01, min(0.99, adjusted_prob))  # Keep in valid range
+    # Then apply margin
+    implied = adjusted_prob * (1 + margin)
     return round(1 / implied, 2)
 
 
@@ -299,22 +310,28 @@ def seed_database():
 
             # Create odds for multiple bookmakers
             for bookmaker in BOOKMAKERS[:random.randint(2, 4)]:
-                # Add some variance to odds
-                margin = random.uniform(0.04, 0.08)
+                # Add bookmaker margin and variance to simulate mispricing
+                margin = random.uniform(0.03, 0.06)
+
+                # Variance simulates bookmaker's probability estimation error
+                # Negative variance = bookmaker UNDERESTIMATES probability = positive edge for us
+                # We want ~40% of bets to have positive edge for demo purposes
+                def get_variance():
+                    return random.uniform(-0.08, 0.04)  # More likely to underestimate
 
                 odds = MatchOdds(
                     match_id=match.id,
                     bookmaker=bookmaker,
-                    home_win_odds=prob_to_odds(probs_1x2["home_win"], margin + random.uniform(-0.02, 0.02)),
-                    draw_odds=prob_to_odds(probs_1x2["draw"], margin + random.uniform(-0.02, 0.02)),
-                    away_win_odds=prob_to_odds(probs_1x2["away_win"], margin + random.uniform(-0.02, 0.02)),
-                    over_25_odds=prob_to_odds(probs_goals["over_25"], margin + random.uniform(-0.02, 0.02)),
-                    under_25_odds=prob_to_odds(probs_goals["under_25"], margin + random.uniform(-0.02, 0.02)),
-                    btts_yes_odds=prob_to_odds(probs_goals["btts_yes"], margin + random.uniform(-0.02, 0.02)),
-                    btts_no_odds=prob_to_odds(probs_goals["btts_no"], margin + random.uniform(-0.02, 0.02)),
-                    home_win_implied=odds_to_prob(prob_to_odds(probs_1x2["home_win"], margin)),
-                    draw_implied=odds_to_prob(prob_to_odds(probs_1x2["draw"], margin)),
-                    away_win_implied=odds_to_prob(prob_to_odds(probs_1x2["away_win"], margin)),
+                    home_win_odds=prob_to_odds(probs_1x2["home_win"], margin, get_variance()),
+                    draw_odds=prob_to_odds(probs_1x2["draw"], margin, get_variance()),
+                    away_win_odds=prob_to_odds(probs_1x2["away_win"], margin, get_variance()),
+                    over_25_odds=prob_to_odds(probs_goals["over_25"], margin, get_variance()),
+                    under_25_odds=prob_to_odds(probs_goals["under_25"], margin, get_variance()),
+                    btts_yes_odds=prob_to_odds(probs_goals["btts_yes"], margin, get_variance()),
+                    btts_no_odds=prob_to_odds(probs_goals["btts_no"], margin, get_variance()),
+                    home_win_implied=odds_to_prob(prob_to_odds(probs_1x2["home_win"], margin, 0)),
+                    draw_implied=odds_to_prob(prob_to_odds(probs_1x2["draw"], margin, 0)),
+                    away_win_implied=odds_to_prob(prob_to_odds(probs_1x2["away_win"], margin, 0)),
                 )
                 db.add(odds)
 
