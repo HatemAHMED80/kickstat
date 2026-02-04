@@ -13,6 +13,27 @@ from app.api.v1 import router as api_v1_router
 settings = get_settings()
 
 
+def run_background_sync():
+    """Run sync in background thread."""
+    import time
+    time.sleep(5)  # Wait for API to be fully ready
+
+    logger.info("Starting background sync for all leagues...")
+    try:
+        from scripts.sync_football_data import sync_fixtures
+        leagues = ["ligue_1", "premier_league", "la_liga", "bundesliga", "serie_a"]
+        for league in leagues:
+            try:
+                logger.info(f"Syncing {league}...")
+                sync_fixtures(league)
+                time.sleep(2)  # Small delay between leagues to avoid rate limits
+            except Exception as e:
+                logger.error(f"Failed to sync {league}: {e}")
+        logger.info("Background sync completed for all leagues!")
+    except Exception as e:
+        logger.error(f"Background sync failed: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
@@ -23,21 +44,11 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database tables...")
     init_db()
 
-    # Auto-sync real data if database is empty (for Render's ephemeral filesystem)
-    from app.core.database import SessionLocal
-    from app.models.database import Team
-    db = SessionLocal()
-    try:
-        team_count = db.query(Team).count()
-        if team_count == 0:
-            logger.info("Database is empty, syncing real data...")
-            from scripts.sync_football_data import sync_fixtures
-            sync_fixtures("ligue_1")
-            logger.info("Real data synced successfully!")
-    except Exception as e:
-        logger.warning(f"Could not check/seed database: {e}")
-    finally:
-        db.close()
+    # Start background sync in a separate thread (non-blocking)
+    import threading
+    sync_thread = threading.Thread(target=run_background_sync, daemon=True)
+    sync_thread.start()
+    logger.info("Background sync thread started - API is ready!")
 
     yield
     logger.info("Shutting down Football Prediction System...")
