@@ -113,6 +113,7 @@ async def get_opportunities(
     db: Session = Depends(get_db),
     user: Optional[User] = Depends(get_current_user_optional),
     risk_level: Optional[str] = Query(None, description="Filter by risk: safe, medium, risky"),
+    competition: Optional[str] = Query(None, description="Filter by competition name"),
     min_edge: float = Query(5.0, description="Minimum edge percentage"),
     limit: int = Query(20, le=50),
 ):
@@ -126,20 +127,24 @@ async def get_opportunities(
 
     opportunities = calculator.get_top_opportunities(
         db=db,
-        limit=limit,
+        limit=limit * 3 if competition else limit,  # Get more to filter
         min_edge=min_edge,
         risk_level=risk_level,
     )
 
-    # Determine access level - bypass in development
-    is_dev = settings.environment == "development"
-    is_subscriber = is_dev or (
-        user is not None
-        and user.subscription_status == "active"
-        and user.subscription_tier in ("basic", "pro")
-    )
+    # Filter by competition if specified
+    if competition:
+        filtered_opportunities = []
+        for edge in opportunities:
+            match = db.query(Match).filter(Match.id == edge.match_id).first()
+            if match and match.competition and match.competition.name == competition:
+                filtered_opportunities.append(edge)
+        opportunities = filtered_opportunities[:limit]
 
-    free_preview_count = 0 if is_dev else 3
+    # For MVP phase, give full access to everyone
+    # TODO: Re-enable subscription check when payment is ready
+    is_subscriber = True
+    free_preview_count = 0
 
     # Build response
     result = []
@@ -203,6 +208,40 @@ async def get_opportunities(
     )
 
 
+@router.get("/competitions")
+async def get_competitions(db: Session = Depends(get_db)):
+    """
+    Get all available competitions with match counts.
+    """
+    from app.models.database import Competition
+    from sqlalchemy import func
+
+    # Get competitions with upcoming match counts
+    competitions = db.query(Competition).all()
+
+    result = []
+    for comp in competitions:
+        match_count = db.query(Match).filter(
+            Match.competition_id == comp.id,
+            Match.status == "scheduled"
+        ).count()
+
+        if match_count > 0:  # Only return competitions with upcoming matches
+            result.append({
+                "id": comp.id,
+                "name": comp.name,
+                "short_name": comp.short_name,
+                "country": comp.country,
+                "logo_url": comp.logo_url,
+                "match_count": match_count,
+            })
+
+    # Sort by match count descending
+    result.sort(key=lambda x: x["match_count"], reverse=True)
+
+    return {"competitions": result}
+
+
 @router.get("/matches/{match_id}/edges")
 async def get_match_edges(
     match_id: int,
@@ -222,10 +261,9 @@ async def get_match_edges(
             detail="Match not found",
         )
 
-    # Check access
-    has_access = False
-    if user:
-        has_access = check_match_access(user, match_id, db)
+    # For MVP phase, give full access to everyone
+    # TODO: Re-enable subscription check when payment is ready
+    has_access = True
 
     # Get edges
     edges = (
@@ -322,13 +360,9 @@ async def get_match_analysis(
         match.away_team.name
     )
 
-    # Check access - in development, allow all
-    is_dev = settings.environment == "development"
-    is_subscriber = (
-        user is not None
-        and user.subscription_status == "active"
-    )
-    has_access = is_dev or is_subscriber
+    # For now, allow full analysis access to everyone (MVP phase)
+    # TODO: Re-enable subscription check when payment is ready
+    has_access = True
 
     # Build response
     response = {
