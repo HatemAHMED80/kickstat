@@ -4,7 +4,7 @@ API v1 Router - Aggregates all endpoint routers.
 
 from fastapi import APIRouter
 
-from .endpoints import matches, teams, predictions, competitions, auth, subscriptions, odds, webhooks
+from .endpoints import admin, matches, teams, predictions, competitions, auth, subscriptions, odds, webhooks
 
 router = APIRouter()
 
@@ -19,3 +19,4 @@ router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 router.include_router(subscriptions.router, prefix="/subscriptions", tags=["Subscriptions"])
 router.include_router(odds.router, prefix="/odds", tags=["Odds & Edges"])
 router.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"])
+router.include_router(admin.router, prefix="/admin", tags=["Admin"])

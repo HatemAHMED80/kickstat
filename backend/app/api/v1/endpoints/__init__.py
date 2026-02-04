@@ -1,7 +1,8 @@
 """API v1 Endpoints."""
-from . import auth, competitions, matches, odds, predictions, subscriptions, teams, webhooks
+from . import admin, auth, competitions, matches, odds, predictions, subscriptions, teams, webhooks
 
 __all__ = [
+    "admin",
     "auth",
     "competitions",
     "matches",
