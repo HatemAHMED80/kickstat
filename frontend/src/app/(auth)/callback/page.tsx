@@ -6,10 +6,10 @@ import { getSupabase } from '@/lib/supabase';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const supabase = getSupabase();
 
   useEffect(() => {
     const handleCallback = async () => {
+      const supabase = getSupabase();
       // Exchange the code for a session
       const { error } = await supabase.auth.exchangeCodeForSession(
         window.location.href
@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [router, supabase.auth]);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center">

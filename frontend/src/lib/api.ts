@@ -7,10 +7,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
     ? "https://kickstat-api.onrender.com"
     : "http://localhost:8000");
 
-console.log("[API] NODE_ENV:", process.env.NODE_ENV);
-console.log("[API] NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
-console.log("[API] Using API_BASE_URL:", API_BASE_URL);
-
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
   headers: {
@@ -158,11 +154,26 @@ export async function disconnectTelegram() {
   return response.data;
 }
 
+// Competitions
+export interface CompetitionInfo {
+  id: number;
+  name: string;
+  short_name: string;
+  country: string;
+  logo_url: string;
+  match_count: number;
+}
+
+export async function getCompetitions(): Promise<{ competitions: CompetitionInfo[] }> {
+  const response = await api.get("/odds/competitions");
+  return response.data;
+}
+
 // Opportunities
 export async function getOpportunities(params?: {
   min_edge?: number;
   risk_level?: string;
-  competition_id?: number;
+  competition?: string;  // Filter by competition name
   limit?: number;
 }): Promise<OpportunitiesListResponse> {
   const response = await api.get("/odds/opportunities", { params });
