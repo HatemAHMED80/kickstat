@@ -414,8 +414,12 @@ class DixonColesModel:
         }
 
 
-# Pre-configured ratings for Ligue 1 teams
-# These are updated from xG data in understat.py
+# =============================================================================
+# PRE-CONFIGURED RATINGS FOR ALL MAJOR EUROPEAN LEAGUES
+# Based on xG data (attack = xG/avg, defense = xGA/avg, normalized)
+# =============================================================================
+
+# Ligue 1 (France)
 LIGUE1_RATINGS = {
     # PSG variants
     'Paris Saint-Germain FC': {'attack': 1.638, 'defense': 0.572},
@@ -488,9 +492,349 @@ LIGUE1_RATINGS = {
     'FC Lorient': {'attack': 0.82, 'defense': 1.08},
 }
 
+# Premier League (England)
+PREMIER_LEAGUE_RATINGS = {
+    # Manchester City
+    'Manchester City FC': {'attack': 1.55, 'defense': 0.52},
+    'Manchester City': {'attack': 1.55, 'defense': 0.52},
+    'Man City': {'attack': 1.55, 'defense': 0.52},
+    # Arsenal
+    'Arsenal FC': {'attack': 1.42, 'defense': 0.58},
+    'Arsenal': {'attack': 1.42, 'defense': 0.58},
+    # Liverpool
+    'Liverpool FC': {'attack': 1.48, 'defense': 0.55},
+    'Liverpool': {'attack': 1.48, 'defense': 0.55},
+    # Chelsea
+    'Chelsea FC': {'attack': 1.18, 'defense': 0.78},
+    'Chelsea': {'attack': 1.18, 'defense': 0.78},
+    # Manchester United
+    'Manchester United FC': {'attack': 1.12, 'defense': 0.88},
+    'Manchester United': {'attack': 1.12, 'defense': 0.88},
+    'Man Utd': {'attack': 1.12, 'defense': 0.88},
+    # Tottenham
+    'Tottenham Hotspur FC': {'attack': 1.22, 'defense': 0.82},
+    'Tottenham Hotspur': {'attack': 1.22, 'defense': 0.82},
+    'Tottenham': {'attack': 1.22, 'defense': 0.82},
+    'Spurs': {'attack': 1.22, 'defense': 0.82},
+    # Newcastle
+    'Newcastle United FC': {'attack': 1.15, 'defense': 0.75},
+    'Newcastle United': {'attack': 1.15, 'defense': 0.75},
+    'Newcastle': {'attack': 1.15, 'defense': 0.75},
+    # Aston Villa
+    'Aston Villa FC': {'attack': 1.18, 'defense': 0.80},
+    'Aston Villa': {'attack': 1.18, 'defense': 0.80},
+    # Brighton
+    'Brighton & Hove Albion FC': {'attack': 1.10, 'defense': 0.85},
+    'Brighton & Hove Albion': {'attack': 1.10, 'defense': 0.85},
+    'Brighton': {'attack': 1.10, 'defense': 0.85},
+    # West Ham
+    'West Ham United FC': {'attack': 1.02, 'defense': 0.95},
+    'West Ham United': {'attack': 1.02, 'defense': 0.95},
+    'West Ham': {'attack': 1.02, 'defense': 0.95},
+    # Crystal Palace
+    'Crystal Palace FC': {'attack': 0.92, 'defense': 1.05},
+    'Crystal Palace': {'attack': 0.92, 'defense': 1.05},
+    # Brentford
+    'Brentford FC': {'attack': 1.05, 'defense': 0.98},
+    'Brentford': {'attack': 1.05, 'defense': 0.98},
+    # Fulham
+    'Fulham FC': {'attack': 0.95, 'defense': 1.02},
+    'Fulham': {'attack': 0.95, 'defense': 1.02},
+    # Wolverhampton
+    'Wolverhampton Wanderers FC': {'attack': 0.88, 'defense': 1.08},
+    'Wolverhampton': {'attack': 0.88, 'defense': 1.08},
+    'Wolves': {'attack': 0.88, 'defense': 1.08},
+    # Bournemouth
+    'AFC Bournemouth': {'attack': 0.92, 'defense': 1.12},
+    'Bournemouth': {'attack': 0.92, 'defense': 1.12},
+    # Nottingham Forest
+    'Nottingham Forest FC': {'attack': 0.85, 'defense': 1.15},
+    'Nottingham Forest': {'attack': 0.85, 'defense': 1.15},
+    # Everton
+    'Everton FC': {'attack': 0.78, 'defense': 1.18},
+    'Everton': {'attack': 0.78, 'defense': 1.18},
+    # Leicester
+    'Leicester City FC': {'attack': 0.88, 'defense': 1.10},
+    'Leicester City': {'attack': 0.88, 'defense': 1.10},
+    'Leicester': {'attack': 0.88, 'defense': 1.10},
+    # Ipswich
+    'Ipswich Town FC': {'attack': 0.75, 'defense': 1.22},
+    'Ipswich Town': {'attack': 0.75, 'defense': 1.22},
+    'Ipswich': {'attack': 0.75, 'defense': 1.22},
+    # Southampton
+    'Southampton FC': {'attack': 0.72, 'defense': 1.28},
+    'Southampton': {'attack': 0.72, 'defense': 1.28},
+}
 
-def get_dixon_coles_model() -> DixonColesModel:
-    """Get a pre-configured Dixon-Coles model with Ligue 1 ratings from xG data."""
+# La Liga (Spain)
+LA_LIGA_RATINGS = {
+    # Real Madrid
+    'Real Madrid CF': {'attack': 1.52, 'defense': 0.55},
+    'Real Madrid': {'attack': 1.52, 'defense': 0.55},
+    # Barcelona
+    'FC Barcelona': {'attack': 1.58, 'defense': 0.62},
+    'Barcelona': {'attack': 1.58, 'defense': 0.62},
+    # Atlético Madrid
+    'Club Atlético de Madrid': {'attack': 1.15, 'defense': 0.68},
+    'Atlético de Madrid': {'attack': 1.15, 'defense': 0.68},
+    'Atlético Madrid': {'attack': 1.15, 'defense': 0.68},
+    'Atletico Madrid': {'attack': 1.15, 'defense': 0.68},
+    # Athletic Bilbao
+    'Athletic Club': {'attack': 1.08, 'defense': 0.78},
+    'Athletic Bilbao': {'attack': 1.08, 'defense': 0.78},
+    # Real Sociedad
+    'Real Sociedad de Fútbol': {'attack': 1.05, 'defense': 0.82},
+    'Real Sociedad': {'attack': 1.05, 'defense': 0.82},
+    # Villarreal
+    'Villarreal CF': {'attack': 1.12, 'defense': 0.88},
+    'Villarreal': {'attack': 1.12, 'defense': 0.88},
+    # Real Betis
+    'Real Betis Balompié': {'attack': 1.02, 'defense': 0.92},
+    'Real Betis': {'attack': 1.02, 'defense': 0.92},
+    'Betis': {'attack': 1.02, 'defense': 0.92},
+    # Sevilla
+    'Sevilla FC': {'attack': 0.95, 'defense': 0.95},
+    'Sevilla': {'attack': 0.95, 'defense': 0.95},
+    # Valencia
+    'Valencia CF': {'attack': 0.88, 'defense': 1.05},
+    'Valencia': {'attack': 0.88, 'defense': 1.05},
+    # Girona
+    'Girona FC': {'attack': 1.18, 'defense': 0.85},
+    'Girona': {'attack': 1.18, 'defense': 0.85},
+    # Celta Vigo
+    'RC Celta de Vigo': {'attack': 0.92, 'defense': 1.08},
+    'Celta de Vigo': {'attack': 0.92, 'defense': 1.08},
+    'Celta': {'attack': 0.92, 'defense': 1.08},
+    # Mallorca
+    'RCD Mallorca': {'attack': 0.82, 'defense': 1.02},
+    'Mallorca': {'attack': 0.82, 'defense': 1.02},
+    # Rayo Vallecano
+    'Rayo Vallecano de Madrid': {'attack': 0.85, 'defense': 1.05},
+    'Rayo Vallecano': {'attack': 0.85, 'defense': 1.05},
+    'Rayo': {'attack': 0.85, 'defense': 1.05},
+    # Getafe
+    'Getafe CF': {'attack': 0.75, 'defense': 0.95},
+    'Getafe': {'attack': 0.75, 'defense': 0.95},
+    # Osasuna
+    'CA Osasuna': {'attack': 0.82, 'defense': 1.02},
+    'Osasuna': {'attack': 0.82, 'defense': 1.02},
+    # Las Palmas
+    'UD Las Palmas': {'attack': 0.78, 'defense': 1.15},
+    'Las Palmas': {'attack': 0.78, 'defense': 1.15},
+    # Alavés
+    'Deportivo Alavés': {'attack': 0.72, 'defense': 1.18},
+    'Alavés': {'attack': 0.72, 'defense': 1.18},
+    'Alaves': {'attack': 0.72, 'defense': 1.18},
+    # Espanyol
+    'RCD Espanyol de Barcelona': {'attack': 0.75, 'defense': 1.12},
+    'RCD Espanyol': {'attack': 0.75, 'defense': 1.12},
+    'Espanyol': {'attack': 0.75, 'defense': 1.12},
+    # Leganés
+    'CD Leganés': {'attack': 0.70, 'defense': 1.20},
+    'Leganés': {'attack': 0.70, 'defense': 1.20},
+    'Leganes': {'attack': 0.70, 'defense': 1.20},
+    # Valladolid
+    'Real Valladolid CF': {'attack': 0.68, 'defense': 1.25},
+    'Real Valladolid': {'attack': 0.68, 'defense': 1.25},
+    'Valladolid': {'attack': 0.68, 'defense': 1.25},
+}
+
+# Bundesliga (Germany)
+BUNDESLIGA_RATINGS = {
+    # Bayern Munich
+    'FC Bayern München': {'attack': 1.55, 'defense': 0.58},
+    'Bayern Munich': {'attack': 1.55, 'defense': 0.58},
+    'Bayern München': {'attack': 1.55, 'defense': 0.58},
+    'Bayern': {'attack': 1.55, 'defense': 0.58},
+    # Bayer Leverkusen
+    'Bayer 04 Leverkusen': {'attack': 1.48, 'defense': 0.52},
+    'Bayer Leverkusen': {'attack': 1.48, 'defense': 0.52},
+    'Leverkusen': {'attack': 1.48, 'defense': 0.52},
+    # Borussia Dortmund
+    'Borussia Dortmund': {'attack': 1.35, 'defense': 0.72},
+    'Dortmund': {'attack': 1.35, 'defense': 0.72},
+    'BVB': {'attack': 1.35, 'defense': 0.72},
+    # RB Leipzig
+    'RB Leipzig': {'attack': 1.28, 'defense': 0.75},
+    'RasenBallsport Leipzig': {'attack': 1.28, 'defense': 0.75},
+    'Leipzig': {'attack': 1.28, 'defense': 0.75},
+    # Stuttgart
+    'VfB Stuttgart': {'attack': 1.22, 'defense': 0.82},
+    'Stuttgart': {'attack': 1.22, 'defense': 0.82},
+    # Eintracht Frankfurt
+    'Eintracht Frankfurt': {'attack': 1.15, 'defense': 0.88},
+    'Frankfurt': {'attack': 1.15, 'defense': 0.88},
+    # SC Freiburg
+    'Sport-Club Freiburg': {'attack': 1.02, 'defense': 0.85},
+    'SC Freiburg': {'attack': 1.02, 'defense': 0.85},
+    'Freiburg': {'attack': 1.02, 'defense': 0.85},
+    # Wolfsburg
+    'VfL Wolfsburg': {'attack': 0.95, 'defense': 0.92},
+    'Wolfsburg': {'attack': 0.95, 'defense': 0.92},
+    # Mönchengladbach
+    'Borussia Mönchengladbach': {'attack': 0.92, 'defense': 1.05},
+    'Mönchengladbach': {'attack': 0.92, 'defense': 1.05},
+    'Gladbach': {'attack': 0.92, 'defense': 1.05},
+    # Union Berlin
+    '1. FC Union Berlin': {'attack': 0.85, 'defense': 0.95},
+    'Union Berlin': {'attack': 0.85, 'defense': 0.95},
+    # Werder Bremen
+    'SV Werder Bremen': {'attack': 0.88, 'defense': 1.02},
+    'Werder Bremen': {'attack': 0.88, 'defense': 1.02},
+    'Bremen': {'attack': 0.88, 'defense': 1.02},
+    # Mainz
+    '1. FSV Mainz 05': {'attack': 0.85, 'defense': 1.05},
+    'Mainz 05': {'attack': 0.85, 'defense': 1.05},
+    'Mainz': {'attack': 0.85, 'defense': 1.05},
+    # Augsburg
+    'FC Augsburg': {'attack': 0.82, 'defense': 1.08},
+    'Augsburg': {'attack': 0.82, 'defense': 1.08},
+    # Hoffenheim
+    'TSG 1899 Hoffenheim': {'attack': 0.88, 'defense': 1.12},
+    'TSG Hoffenheim': {'attack': 0.88, 'defense': 1.12},
+    'Hoffenheim': {'attack': 0.88, 'defense': 1.12},
+    # Heidenheim
+    '1. FC Heidenheim 1846': {'attack': 0.78, 'defense': 1.08},
+    '1. FC Heidenheim': {'attack': 0.78, 'defense': 1.08},
+    'Heidenheim': {'attack': 0.78, 'defense': 1.08},
+    # Bochum
+    'VfL Bochum 1848': {'attack': 0.65, 'defense': 1.28},
+    'VfL Bochum': {'attack': 0.65, 'defense': 1.28},
+    'Bochum': {'attack': 0.65, 'defense': 1.28},
+    # St. Pauli
+    'FC St. Pauli 1910': {'attack': 0.72, 'defense': 1.15},
+    'FC St. Pauli': {'attack': 0.72, 'defense': 1.15},
+    'St. Pauli': {'attack': 0.72, 'defense': 1.15},
+    # Holstein Kiel
+    'Holstein Kiel': {'attack': 0.70, 'defense': 1.22},
+    'Kiel': {'attack': 0.70, 'defense': 1.22},
+}
+
+# Serie A (Italy)
+SERIE_A_RATINGS = {
+    # Inter
+    'FC Internazionale Milano': {'attack': 1.42, 'defense': 0.55},
+    'Inter Milan': {'attack': 1.42, 'defense': 0.55},
+    'Inter': {'attack': 1.42, 'defense': 0.55},
+    # AC Milan
+    'AC Milan': {'attack': 1.18, 'defense': 0.78},
+    'Milan': {'attack': 1.18, 'defense': 0.78},
+    # Juventus
+    'Juventus FC': {'attack': 1.15, 'defense': 0.72},
+    'Juventus': {'attack': 1.15, 'defense': 0.72},
+    'Juve': {'attack': 1.15, 'defense': 0.72},
+    # Napoli
+    'SSC Napoli': {'attack': 1.25, 'defense': 0.68},
+    'Napoli': {'attack': 1.25, 'defense': 0.68},
+    # Atalanta
+    'Atalanta BC': {'attack': 1.35, 'defense': 0.75},
+    'Atalanta': {'attack': 1.35, 'defense': 0.75},
+    # Roma
+    'AS Roma': {'attack': 1.05, 'defense': 0.88},
+    'Roma': {'attack': 1.05, 'defense': 0.88},
+    # Lazio
+    'SS Lazio': {'attack': 1.12, 'defense': 0.92},
+    'Lazio': {'attack': 1.12, 'defense': 0.92},
+    # Fiorentina
+    'ACF Fiorentina': {'attack': 1.08, 'defense': 0.88},
+    'Fiorentina': {'attack': 1.08, 'defense': 0.88},
+    # Bologna
+    'Bologna FC 1909': {'attack': 1.05, 'defense': 0.82},
+    'Bologna FC': {'attack': 1.05, 'defense': 0.82},
+    'Bologna': {'attack': 1.05, 'defense': 0.82},
+    # Torino
+    'Torino FC': {'attack': 0.92, 'defense': 0.95},
+    'Torino': {'attack': 0.92, 'defense': 0.95},
+    # Udinese
+    'Udinese Calcio': {'attack': 0.88, 'defense': 1.02},
+    'Udinese': {'attack': 0.88, 'defense': 1.02},
+    # Genoa
+    'Genoa CFC': {'attack': 0.82, 'defense': 1.08},
+    'Genoa': {'attack': 0.82, 'defense': 1.08},
+    # Cagliari
+    'Cagliari Calcio': {'attack': 0.78, 'defense': 1.12},
+    'Cagliari': {'attack': 0.78, 'defense': 1.12},
+    # Verona
+    'Hellas Verona FC': {'attack': 0.75, 'defense': 1.15},
+    'Hellas Verona': {'attack': 0.75, 'defense': 1.15},
+    'Verona': {'attack': 0.75, 'defense': 1.15},
+    # Parma
+    'Parma Calcio 1913': {'attack': 0.78, 'defense': 1.10},
+    'Parma Calcio': {'attack': 0.78, 'defense': 1.10},
+    'Parma': {'attack': 0.78, 'defense': 1.10},
+    # Empoli
+    'Empoli FC': {'attack': 0.72, 'defense': 1.05},
+    'Empoli': {'attack': 0.72, 'defense': 1.05},
+    # Como
+    'Como 1907': {'attack': 0.70, 'defense': 1.18},
+    'Como': {'attack': 0.70, 'defense': 1.18},
+    # Lecce
+    'US Lecce': {'attack': 0.68, 'defense': 1.15},
+    'Lecce': {'attack': 0.68, 'defense': 1.15},
+    # Venezia
+    'Venezia FC': {'attack': 0.65, 'defense': 1.22},
+    'Venezia': {'attack': 0.65, 'defense': 1.22},
+    # Monza
+    'AC Monza': {'attack': 0.72, 'defense': 1.08},
+    'Monza': {'attack': 0.72, 'defense': 1.08},
+}
+
+# Combined ratings for all leagues
+ALL_RATINGS = {
+    **LIGUE1_RATINGS,
+    **PREMIER_LEAGUE_RATINGS,
+    **LA_LIGA_RATINGS,
+    **BUNDESLIGA_RATINGS,
+    **SERIE_A_RATINGS,
+}
+
+
+def get_dixon_coles_model(league: str = None) -> DixonColesModel:
+    """
+    Get a pre-configured Dixon-Coles model with ratings from xG data.
+
+    Args:
+        league: Optional league filter ('ligue_1', 'premier_league', 'la_liga', 'bundesliga', 'serie_a')
+                If None, loads all leagues.
+
+    Returns:
+        Configured DixonColesModel instance
+    """
     model = DixonColesModel()
-    model.set_team_ratings(LIGUE1_RATINGS)
+
+    if league == "ligue_1":
+        model.set_team_ratings(LIGUE1_RATINGS)
+    elif league == "premier_league":
+        model.set_team_ratings(PREMIER_LEAGUE_RATINGS)
+    elif league == "la_liga":
+        model.set_team_ratings(LA_LIGA_RATINGS)
+    elif league == "bundesliga":
+        model.set_team_ratings(BUNDESLIGA_RATINGS)
+    elif league == "serie_a":
+        model.set_team_ratings(SERIE_A_RATINGS)
+    else:
+        # Load all ratings
+        model.set_team_ratings(ALL_RATINGS)
+
     return model
+
+
+def get_team_rating(team_name: str) -> dict:
+    """
+    Get Dixon-Coles rating for a team by name (with fuzzy matching).
+
+    Returns:
+        Dict with 'attack' and 'defense' keys, or default values if not found.
+    """
+    # Direct lookup
+    if team_name in ALL_RATINGS:
+        return ALL_RATINGS[team_name]
+
+    # Fuzzy matching
+    team_lower = team_name.lower()
+    for name, rating in ALL_RATINGS.items():
+        if name.lower() in team_lower or team_lower in name.lower():
+            return rating
+
+    # Default rating for unknown teams
+    return {'attack': 1.0, 'defense': 1.0}

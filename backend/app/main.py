@@ -23,17 +23,17 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database tables...")
     init_db()
 
-    # Auto-seed if database is empty (for Render's ephemeral filesystem)
+    # Auto-sync real data if database is empty (for Render's ephemeral filesystem)
     from app.core.database import SessionLocal
     from app.models.database import Team
     db = SessionLocal()
     try:
         team_count = db.query(Team).count()
         if team_count == 0:
-            logger.info("Database is empty, seeding with demo data...")
-            from scripts.seed_data import seed_database
-            seed_database()
-            logger.info("Database seeded successfully!")
+            logger.info("Database is empty, syncing real data...")
+            from scripts.sync_football_data import sync_fixtures
+            sync_fixtures("ligue_1")
+            logger.info("Real data synced successfully!")
     except Exception as e:
         logger.warning(f"Could not check/seed database: {e}")
     finally:
@@ -72,36 +72,21 @@ async def health_check():
     return {"status": "healthy", "version": "0.1.0"}
 
 
-@app.post("/admin/seed")
-async def seed_database(secret: str):
-    """
-    Seed the database with demo data.
-    Requires secret key for protection.
-    """
-    if secret != settings.secret_key:
-        return {"error": "Invalid secret key"}
-
-    try:
-        from scripts.seed_data import seed_database as run_seed
-        run_seed()
-        return {"status": "success", "message": "Database seeded successfully"}
-    except Exception as e:
-        logger.error(f"Seed failed: {e}")
-        return {"status": "error", "message": str(e)}
-
-
 @app.post("/admin/sync")
-async def sync_real_data(secret: str):
+async def sync_real_data(secret: str, league: str = "ligue_1"):
     """
-    Sync real data from API-Football.
-    Fetches upcoming Ligue 1 fixtures and odds.
+    Sync real data from Football-Data.org + The Odds API.
+
+    Args:
+        secret: Admin secret key
+        league: League to sync (ligue_1, premier_league, la_liga, bundesliga, serie_a)
     """
     if secret != settings.secret_key:
         return {"error": "Invalid secret key"}
 
     try:
-        from scripts.sync_real_data import sync_fixtures
-        result = sync_fixtures()
+        from scripts.sync_football_data import sync_fixtures
+        result = sync_fixtures(league)
         return {"status": "success", **result}
     except Exception as e:
         logger.error(f"Sync failed: {e}")

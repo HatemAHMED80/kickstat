@@ -1,7 +1,10 @@
 """
-Sync real data from Football-Data.org.
+Sync real data from Football-Data.org + The Odds API.
 
-Uses the free tier which includes Ligue 1 with current season data.
+Uses:
+- Football-Data.org: Real fixtures, teams, standings
+- The Odds API: Real betting odds from multiple bookmakers
+- Dixon-Coles Model: Advanced Poisson model for predictions
 """
 
 from datetime import datetime
@@ -17,68 +20,18 @@ from app.models.database import (
     Competition, Team, Match, Prediction, MatchOdds, EdgeCalculation
 )
 from app.services.data.football_data_org import get_football_data_client, FootballDataOrgClient
+from app.services.data.odds_api import get_odds_api_client, TheOddsAPIClient
+from app.services.ml.dixon_coles import get_dixon_coles_model, get_team_rating
 
 
 settings = get_settings()
-
-
-def calculate_match_probabilities(home_elo: float, away_elo: float) -> dict:
-    """Calculate 1X2 probabilities based on ELO ratings."""
-    elo_diff = home_elo - away_elo
-    elo_diff += 65  # Home advantage
-
-    home_exp = 1 / (1 + 10 ** (-elo_diff / 400))
-    away_exp = 1 - home_exp
-
-    draw_base = 0.26
-    draw_adj = 0.04 * (1 - abs(home_exp - 0.5) * 2)
-    draw_prob = draw_base + draw_adj
-
-    home_prob = home_exp * (1 - draw_prob)
-    away_prob = away_exp * (1 - draw_prob)
-
-    total = home_prob + draw_prob + away_prob
-
-    return {
-        "home_win": round(home_prob / total, 3),
-        "draw": round(draw_prob / total, 3),
-        "away_win": round(away_prob / total, 3),
-    }
-
-
-def calculate_goals_probs(home_elo: float, away_elo: float) -> dict:
-    """Calculate over/under and BTTS probabilities."""
-    avg_goals = 2.6
-    elo_factor = (home_elo + away_elo - 3000) / 1000
-
-    expected_total = avg_goals + elo_factor * 0.3
-
-    over_25_prob = 0.48 + (expected_total - 2.6) * 0.15
-    over_25_prob = max(0.30, min(0.70, over_25_prob))
-
-    btts_prob = 0.50 + (expected_total - 2.6) * 0.1
-    btts_prob = max(0.35, min(0.65, btts_prob))
-
-    return {
-        "over_25": round(over_25_prob, 3),
-        "under_25": round(1 - over_25_prob, 3),
-        "btts_yes": round(btts_prob, 3),
-        "btts_no": round(1 - btts_prob, 3),
-    }
-
-
-def prob_to_odds(prob: float) -> float:
-    """Convert probability to decimal odds."""
-    if prob <= 0:
-        return 10.0
-    return round(1 / prob, 2)
 
 
 def odds_to_prob(odds: float) -> float:
     """Convert decimal odds to implied probability."""
     if odds <= 1:
         return 0
-    return round(1 / odds, 3)
+    return round(1 / odds, 4)
 
 
 def calculate_edge(model_prob: float, book_prob: float) -> float:
@@ -88,74 +41,130 @@ def calculate_edge(model_prob: float, book_prob: float) -> float:
     return round((model_prob - book_prob) / book_prob * 100, 2)
 
 
-def classify_risk(edge: float, confidence: float) -> str:
-    """Classify bet risk level."""
-    if edge >= 10 and confidence >= 0.7:
+def classify_risk(model_prob: float, edge: float) -> str:
+    """Classify bet risk level based on probability and edge."""
+    if model_prob >= 0.6:
         return "safe"
-    elif edge >= 5 and confidence >= 0.5:
+    elif model_prob >= 0.4:
         return "medium"
     else:
         return "risky"
 
 
-def kelly_criterion(prob: float, odds: float, fraction: float = 0.25) -> float:
-    """Calculate Kelly criterion stake."""
+def kelly_criterion(prob: float, odds: float, fraction: float = 0.5) -> float:
+    """Calculate Kelly criterion stake (half-Kelly by default)."""
+    if odds <= 1 or prob <= 0:
+        return 0
     b = odds - 1
-    q = 1 - prob
-    kelly = (b * prob - q) / b
-    return round(max(0, kelly * fraction), 3)
+    kelly = ((prob * odds) - 1) / b
+    return round(max(0, kelly * fraction), 4)
 
 
-def generate_bookmaker_odds(model_probs: dict, margin: float = 0.05) -> dict:
+def match_teams_fuzzy(name1: str, name2: str) -> bool:
+    """Fuzzy match two team names."""
+    n1 = name1.lower().replace("fc ", "").replace(" fc", "").strip()
+    n2 = name2.lower().replace("fc ", "").replace(" fc", "").strip()
+    return n1 in n2 or n2 in n1
+
+
+def fetch_real_odds(odds_client: TheOddsAPIClient, sport_key: str = "soccer_france_ligue_one"):
+    """Fetch real odds from The Odds API."""
+    settings = get_settings()
+
+    if not settings.odds_api_key:
+        logger.warning("No ODDS_API_KEY configured - skipping real odds fetch")
+        return []
+
+    try:
+        odds_data = odds_client.get_odds(sport_key)
+        logger.info(f"Fetched real odds for {len(odds_data)} matches from The Odds API")
+        return odds_data
+    except Exception as e:
+        logger.error(f"Failed to fetch odds: {e}")
+        return []
+
+
+def sync_fixtures(league: str = "ligue_1"):
     """
-    Generate simulated bookmaker odds from model probabilities.
-    Adds variance to simulate market inefficiencies that create betting edges.
+    Sync real fixtures from Football-Data.org with real odds from The Odds API.
+    Uses Dixon-Coles model for predictions.
+
+    Args:
+        league: League to sync (ligue_1, premier_league, la_liga, bundesliga, serie_a)
     """
-    import random
+    logger.info("=" * 60)
+    logger.info("SYNCING REAL DATA WITH DIXON-COLES MODEL")
+    logger.info("=" * 60)
 
-    adjusted_probs = {}
-    for key, prob in model_probs.items():
-        # Simulate market inefficiency: bookmaker estimate varies from model
-        # This creates opportunities where model finds value
-        variance = random.uniform(-0.12, 0.08)  # Bookmaker can under/overestimate
-        book_prob = prob * (1 + margin + variance)
-        adjusted_probs[key] = max(0.05, min(0.95, book_prob))
-
-    return {
-        "home_win_odds": prob_to_odds(adjusted_probs.get("home_win", 0.33)),
-        "draw_odds": prob_to_odds(adjusted_probs.get("draw", 0.33)),
-        "away_win_odds": prob_to_odds(adjusted_probs.get("away_win", 0.33)),
-        "over_25_odds": prob_to_odds(adjusted_probs.get("over_25", 0.5)),
-        "under_25_odds": prob_to_odds(adjusted_probs.get("under_25", 0.5)),
+    # League configurations
+    LEAGUES = {
+        "ligue_1": {
+            "fd_code": FootballDataOrgClient.LIGUE_1,
+            "odds_key": TheOddsAPIClient.SPORTS["ligue_1"],
+            "api_id": 61,
+            "name": "Ligue 1",
+            "country": "France",
+        },
+        "premier_league": {
+            "fd_code": FootballDataOrgClient.PREMIER_LEAGUE,
+            "odds_key": TheOddsAPIClient.SPORTS["premier_league"],
+            "api_id": 39,
+            "name": "Premier League",
+            "country": "England",
+        },
+        "la_liga": {
+            "fd_code": FootballDataOrgClient.LA_LIGA,
+            "odds_key": TheOddsAPIClient.SPORTS["la_liga"],
+            "api_id": 140,
+            "name": "La Liga",
+            "country": "Spain",
+        },
+        "bundesliga": {
+            "fd_code": FootballDataOrgClient.BUNDESLIGA,
+            "odds_key": TheOddsAPIClient.SPORTS["bundesliga"],
+            "api_id": 78,
+            "name": "Bundesliga",
+            "country": "Germany",
+        },
+        "serie_a": {
+            "fd_code": FootballDataOrgClient.SERIE_A,
+            "odds_key": TheOddsAPIClient.SPORTS["serie_a"],
+            "api_id": 135,
+            "name": "Serie A",
+            "country": "Italy",
+        },
     }
 
+    league_config = LEAGUES.get(league, LEAGUES["ligue_1"])
+    logger.info(f"Syncing {league_config['name']} ({league_config['country']})...")
 
-def sync_fixtures():
-    """Sync real fixtures from Football-Data.org."""
-    logger.info("Starting real data sync from Football-Data.org...")
+    # Initialize Dixon-Coles model for this league
+    dc_model = get_dixon_coles_model(league)
+    logger.info(f"Loaded Dixon-Coles model with {len(dc_model.teams)} team ratings")
 
     api = get_football_data_client()
+    odds_client = get_odds_api_client()
     db = SessionLocal()
 
     try:
         # Get competition info
-        comp_data = api.get_competition(FootballDataOrgClient.LIGUE_1)
+        comp_data = api.get_competition(league_config["fd_code"])
         logger.info(f"Competition: {comp_data.get('name')} - Season {comp_data.get('currentSeason', {}).get('startDate', 'N/A')}")
 
         current_season = comp_data.get("currentSeason", {})
         season_year = current_season.get("startDate", "2025")[:4]
 
-        # Get or create Ligue 1 competition
-        competition = db.query(Competition).filter(Competition.api_id == 61).first()
+        # Get or create competition
+        competition = db.query(Competition).filter(Competition.api_id == league_config["api_id"]).first()
         if not competition:
             competition = Competition(
-                api_id=61,
-                name="Ligue 1",
-                short_name="L1",
-                country="France",
+                api_id=league_config["api_id"],
+                name=league_config["name"],
+                short_name=league_config["name"][:3].upper(),
+                country=league_config["country"],
                 type="league",
                 season=int(season_year),
-                logo_url="https://media.api-sports.io/football/leagues/61.png"
+                logo_url=f"https://media.api-sports.io/football/leagues/{league_config['api_id']}.png"
             )
             db.add(competition)
             db.commit()
@@ -164,9 +173,14 @@ def sync_fixtures():
             competition.season = int(season_year)
             db.commit()
 
+        # Fetch REAL odds from The Odds API
+        logger.info("Fetching real odds from The Odds API...")
+        real_odds_data = fetch_real_odds(odds_client, league_config["odds_key"])
+        logger.info(f"Got real odds for {len(real_odds_data)} matches")
+
         # Fetch teams
-        logger.info("Fetching Ligue 1 teams...")
-        api_teams = api.get_teams(FootballDataOrgClient.LIGUE_1)
+        logger.info(f"Fetching {league_config['name']} teams...")
+        api_teams = api.get_teams(league_config["fd_code"])
         logger.info(f"Found {len(api_teams)} teams")
 
         team_map = {}  # API team ID -> local team
@@ -176,15 +190,17 @@ def sync_fixtures():
 
             existing = db.query(Team).filter(Team.api_id == team_id).first()
             if not existing:
-                # Assign ELO based on historical strength
-                elo = get_team_elo(team_name)
+                # Get Dixon-Coles rating
+                dc_rating = get_team_rating(team_name)
                 team = Team(
                     api_id=team_id,
                     name=team_name,
                     short_name=team_data.get("tla"),
                     code=team_data.get("tla"),
                     logo_url=team_data.get("crest"),
-                    elo_rating=elo,
+                    # Store attack/defense as ELO for backwards compatibility
+                    # ELO = (attack * 500) + (2 - defense) * 500 normalized to ~1500 range
+                    elo_rating=int(dc_rating['attack'] * 500 + (2 - dc_rating['defense']) * 500),
                 )
                 db.add(team)
                 db.commit()
@@ -196,8 +212,8 @@ def sync_fixtures():
         logger.info(f"Synced {len(team_map)} teams")
 
         # Fetch scheduled matches
-        logger.info("Fetching scheduled Ligue 1 matches...")
-        matches = api.get_scheduled_matches(FootballDataOrgClient.LIGUE_1)
+        logger.info(f"Fetching scheduled {league_config['name']} matches...")
+        matches = api.get_scheduled_matches(league_config["fd_code"])
         logger.info(f"Found {len(matches)} scheduled matches")
 
         matches_created = 0
@@ -244,15 +260,16 @@ def sync_fixtures():
             db.refresh(match)
             matches_created += 1
 
-            # Calculate predictions
-            home_elo = home_team.elo_rating or 1500
-            away_elo = away_team.elo_rating or 1500
+            # Calculate predictions using Dixon-Coles model
+            dc_predictions = dc_model.predict_all_markets(home_team.name, away_team.name)
+            probs_1x2 = dc_predictions['1x2']
+            probs_over_under = dc_predictions['over_under']
+            probs_btts = dc_predictions['btts']
+            expected_goals = dc_predictions['expected_goals']
 
-            probs_1x2 = calculate_match_probabilities(home_elo, away_elo)
-            probs_goals = calculate_goals_probs(home_elo, away_elo)
-
-            elo_diff = abs(home_elo - away_elo)
-            confidence = min(0.9, 0.5 + elo_diff / 500)
+            # Confidence based on expected goals difference (higher diff = more confident)
+            xg_diff = abs(expected_goals['home'] - expected_goals['away'])
+            confidence = min(0.9, 0.5 + xg_diff * 0.15)
 
             prediction = Prediction(
                 match_id=match.id,
@@ -260,68 +277,89 @@ def sync_fixtures():
                 draw_prob=probs_1x2["draw"] * 100,
                 away_win_prob=probs_1x2["away_win"] * 100,
                 confidence=confidence,
-                model_version="v1.0-elo",
+                model_version="v2.0-dixon-coles",
             )
             db.add(prediction)
             db.commit()
             db.refresh(prediction)
 
-            # Generate simulated odds (football-data.org doesn't provide odds on free tier)
-            all_probs = {**probs_1x2, **probs_goals}
-            simulated_odds = generate_bookmaker_odds(all_probs)
+            logger.debug(f"  DC predictions: H={probs_1x2['home_win']:.1%} D={probs_1x2['draw']:.1%} A={probs_1x2['away_win']:.1%}")
 
-            # Create odds record
-            match_odds = MatchOdds(
-                match_id=match.id,
-                bookmaker="Simulated",
-                home_win_odds=simulated_odds["home_win_odds"],
-                draw_odds=simulated_odds["draw_odds"],
-                away_win_odds=simulated_odds["away_win_odds"],
-                over_25_odds=simulated_odds["over_25_odds"],
-                under_25_odds=simulated_odds["under_25_odds"],
-                home_win_implied=odds_to_prob(simulated_odds["home_win_odds"]),
-                draw_implied=odds_to_prob(simulated_odds["draw_odds"]),
-                away_win_implied=odds_to_prob(simulated_odds["away_win_odds"]),
-            )
-            db.add(match_odds)
-            odds_created += 1
-            db.commit()
+            # Find REAL odds for this match from The Odds API
+            matched_odds = None
+            for odds_match in real_odds_data:
+                if (match_teams_fuzzy(home_team.name, odds_match.home_team) and
+                    match_teams_fuzzy(away_team.name, odds_match.away_team)):
+                    matched_odds = odds_match
+                    break
 
-            # Calculate edges (compare model vs simulated bookmaker)
-            markets = [
-                ("1x2_home", "home_win_odds", probs_1x2["home_win"]),
-                ("1x2_draw", "draw_odds", probs_1x2["draw"]),
-                ("1x2_away", "away_win_odds", probs_1x2["away_win"]),
-                ("over_25", "over_25_odds", probs_goals["over_25"]),
-                ("under_25", "under_25_odds", probs_goals["under_25"]),
-            ]
-
-            for market, odds_key, model_prob in markets:
-                best_odds = simulated_odds[odds_key]
-                book_prob = odds_to_prob(best_odds)
-                edge = calculate_edge(model_prob, book_prob)
-
-                if edge > 3:
-                    risk = classify_risk(edge, confidence)
-                    kelly = kelly_criterion(model_prob, best_odds)
-
-                    edge_calc = EdgeCalculation(
+            if matched_odds and matched_odds.bookmakers:
+                # Create odds records for each REAL bookmaker
+                for bm in matched_odds.bookmakers:
+                    match_odds = MatchOdds(
                         match_id=match.id,
-                        prediction_id=prediction.id,
-                        market=market,
-                        model_probability=model_prob,
-                        bookmaker_probability=book_prob,
-                        edge_percentage=edge,
-                        best_odds=best_odds,
-                        bookmaker_name="Simulated",
-                        risk_level=risk,
-                        kelly_stake=kelly,
-                        confidence=confidence,
+                        bookmaker=bm.bookmaker,
+                        home_win_odds=bm.home_win,
+                        draw_odds=bm.draw,
+                        away_win_odds=bm.away_win,
+                        over_25_odds=bm.over_25 if bm.over_25 else None,
+                        under_25_odds=bm.under_25 if bm.under_25 else None,
+                        btts_yes_odds=bm.btts_yes if bm.btts_yes else None,
+                        btts_no_odds=bm.btts_no if bm.btts_no else None,
+                        home_win_implied=odds_to_prob(bm.home_win),
+                        draw_implied=odds_to_prob(bm.draw),
+                        away_win_implied=odds_to_prob(bm.away_win),
                     )
-                    db.add(edge_calc)
-                    edges_created += 1
+                    db.add(match_odds)
+                    odds_created += 1
 
-            db.commit()
+                db.commit()
+                logger.info(f"  ✓ {home_team.name} vs {away_team.name} - {len(matched_odds.bookmakers)} real bookmakers")
+
+                # Calculate edges (compare Dixon-Coles model vs REAL bookmaker odds)
+                # Get best odds across all bookmakers
+                best_1x2 = matched_odds.get_best_odds("1x2")
+
+                # All markets to check for edges
+                markets = [
+                    ("1x2_home", best_1x2.get("home_win", {}).get("odds", 0), best_1x2.get("home_win", {}).get("bookmaker", ""), probs_1x2["home_win"]),
+                    ("1x2_draw", best_1x2.get("draw", {}).get("odds", 0), best_1x2.get("draw", {}).get("bookmaker", ""), probs_1x2["draw"]),
+                    ("1x2_away", best_1x2.get("away_win", {}).get("odds", 0), best_1x2.get("away_win", {}).get("bookmaker", ""), probs_1x2["away_win"]),
+                    ("over_25", 0, "", probs_over_under.get("over_2.5", 0)),  # Odds API doesn't have O/U in free tier
+                    ("btts_yes", 0, "", probs_btts.get("btts_yes", 0)),  # Same for BTTS
+                ]
+
+                for market, best_odds, bookmaker, model_prob in markets:
+                    if best_odds <= 1.0 or model_prob <= 0:
+                        continue
+
+                    book_prob = odds_to_prob(best_odds)
+                    edge = calculate_edge(model_prob, book_prob)
+
+                    # Only create edge calculation if edge > 3%
+                    if edge > 3:
+                        risk = classify_risk(model_prob, edge)
+                        kelly = kelly_criterion(model_prob, best_odds)
+
+                        edge_calc = EdgeCalculation(
+                            match_id=match.id,
+                            prediction_id=prediction.id,
+                            market=market,
+                            model_probability=model_prob,
+                            bookmaker_probability=book_prob,
+                            edge_percentage=edge,
+                            best_odds=best_odds,
+                            bookmaker_name=bookmaker,
+                            risk_level=risk,
+                            kelly_stake=kelly,
+                            confidence=confidence,
+                        )
+                        db.add(edge_calc)
+                        edges_created += 1
+
+                db.commit()
+            else:
+                logger.warning(f"  ⚠ {home_team.name} vs {away_team.name} - No real odds found")
 
         logger.info("=" * 50)
         logger.info("SYNC COMPLETED")
@@ -344,44 +382,38 @@ def sync_fixtures():
     finally:
         db.close()
         api.close()
+        odds_client.close()
 
 
-def get_team_elo(team_name: str) -> int:
-    """Get historical ELO rating for a team."""
-    # Approximate ELO ratings based on historical performance
-    elo_ratings = {
-        "Paris Saint-Germain": 1850,
-        "Paris Saint-Germain FC": 1850,
-        "AS Monaco": 1720,
-        "AS Monaco FC": 1720,
-        "Olympique de Marseille": 1700,
-        "Olympique Marseille": 1700,
-        "Olympique Lyonnais": 1680,
-        "Olympique Lyon": 1680,
-        "LOSC Lille": 1660,
-        "Lille OSC": 1660,
-        "Stade Rennais FC 1901": 1640,
-        "Stade Rennais": 1640,
-        "OGC Nice": 1620,
-        "RC Lens": 1610,
-        "RC Strasbourg Alsace": 1580,
-        "Montpellier HSC": 1570,
-        "Toulouse FC": 1560,
-        "FC Nantes": 1550,
-        "Stade Brestois 29": 1540,
-        "Stade de Reims": 1530,
-        "AJ Auxerre": 1520,
-        "Angers SCO": 1510,
-        "Le Havre AC": 1500,
-        "AS Saint-Étienne": 1490,
-    }
+def sync_all_leagues():
+    """Sync all supported leagues with real data."""
+    leagues = ["ligue_1", "premier_league", "la_liga", "bundesliga", "serie_a"]
+    results = {}
 
-    for name, elo in elo_ratings.items():
-        if name.lower() in team_name.lower() or team_name.lower() in name.lower():
-            return elo
+    for league in leagues:
+        try:
+            result = sync_fixtures(league)
+            results[league] = result
+        except Exception as e:
+            logger.error(f"Failed to sync {league}: {e}")
+            results[league] = {"error": str(e)}
 
-    return 1500  # Default
+    return results
 
 
 if __name__ == "__main__":
-    sync_fixtures()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Sync real football data")
+    parser.add_argument(
+        "--league",
+        choices=["ligue_1", "premier_league", "la_liga", "bundesliga", "serie_a", "all"],
+        default="ligue_1",
+        help="League to sync (default: ligue_1)"
+    )
+    args = parser.parse_args()
+
+    if args.league == "all":
+        sync_all_leagues()
+    else:
+        sync_fixtures(args.league)
