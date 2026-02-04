@@ -82,15 +82,29 @@ class MatchOddsResponse(BaseModel):
     fetched_at: datetime
 
 
-# Market display names
+# Market display names (French, consistent naming)
 MARKET_NAMES = {
+    # 1X2
     "1x2_home": "Victoire domicile",
     "1x2_draw": "Match nul",
     "1x2_away": "Victoire extérieur",
+    # Over/Under
+    "over_15": "Plus de 1.5 buts",
     "over_25": "Plus de 2.5 buts",
+    "over_35": "Plus de 3.5 buts",
+    "under_15": "Moins de 1.5 buts",
     "under_25": "Moins de 2.5 buts",
-    "btts_yes": "Les deux équipes marquent",
-    "btts_no": "Clean sheet",
+    "under_35": "Moins de 3.5 buts",
+    # BTTS
+    "btts_yes": "Les 2 équipes marquent",
+    "btts_no": "Les 2 ne marquent pas",
+    # Double Chance
+    "double_1x": "1X (Dom ou Nul)",
+    "double_x2": "X2 (Nul ou Ext)",
+    "double_12": "12 (Pas de nul)",
+    # Draw No Bet
+    "dnb_home": "DNB Domicile",
+    "dnb_away": "DNB Extérieur",
 }
 
 
@@ -117,14 +131,15 @@ async def get_opportunities(
         risk_level=risk_level,
     )
 
-    # Determine access level
-    is_subscriber = (
+    # Determine access level - bypass in development
+    is_dev = settings.environment == "development"
+    is_subscriber = is_dev or (
         user is not None
         and user.subscription_status == "active"
         and user.subscription_tier in ("basic", "pro")
     )
 
-    free_preview_count = 3
+    free_preview_count = 0 if is_dev else 3
 
     # Build response
     result = []
@@ -339,6 +354,88 @@ async def get_match_analysis(
     }
 
     if has_access:
+        # Calculate extended markets from score matrix
+        import numpy as np
+        matrix = np.array(dc_predictions.get("score_matrix", []))
+        p1x2 = dc_predictions.get("1x2", {})
+
+        # Double Chance
+        double_chance = {
+            "1x": round((p1x2.get("home_win", 0) + p1x2.get("draw", 0)) * 100, 1),
+            "x2": round((p1x2.get("draw", 0) + p1x2.get("away_win", 0)) * 100, 1),
+            "12": round((p1x2.get("home_win", 0) + p1x2.get("away_win", 0)) * 100, 1),
+        }
+
+        # Draw No Bet
+        total_decisive = p1x2.get("home_win", 0) + p1x2.get("away_win", 0)
+        draw_no_bet = {
+            "home": round((p1x2.get("home_win", 0) / total_decisive * 100) if total_decisive > 0 else 50, 1),
+            "away": round((p1x2.get("away_win", 0) / total_decisive * 100) if total_decisive > 0 else 50, 1),
+        }
+
+        # Clean Sheet & Win to Nil
+        home_cs = float(np.sum(matrix[:, 0])) if len(matrix) > 0 else 0
+        away_cs = float(np.sum(matrix[0, :])) if len(matrix) > 0 else 0
+        home_wtn = float(np.sum(matrix[1:, 0])) if len(matrix) > 1 else 0
+        away_wtn = float(np.sum(matrix[0, 1:])) if len(matrix) > 0 else 0
+
+        clean_sheet = {
+            "home": round(home_cs * 100, 1),
+            "away": round(away_cs * 100, 1),
+        }
+        win_to_nil = {
+            "home": round(home_wtn * 100, 1),
+            "away": round(away_wtn * 100, 1),
+        }
+
+        # Team to Score
+        team_scores = {
+            "home": round((1 - home_cs) * 100, 1) if home_cs < 1 else 0,
+            "away": round((1 - away_cs) * 100, 1) if away_cs < 1 else 0,
+        }
+
+        # Exact Total Goals
+        exact_totals = {}
+        for total in range(7):
+            prob = sum(matrix[i, total-i] for i in range(max(0, total-10), min(total+1, 11))
+                      if 0 <= total-i < 11 and i < len(matrix))
+            exact_totals[str(total)] = round(float(prob) * 100, 1)
+
+        # Odd/Even
+        odd = sum(matrix[i, j] for i in range(min(11, len(matrix)))
+                  for j in range(min(11, len(matrix[0]) if len(matrix) > 0 else 0)) if (i+j) % 2 == 1)
+        even = sum(matrix[i, j] for i in range(min(11, len(matrix)))
+                   for j in range(min(11, len(matrix[0]) if len(matrix) > 0 else 0)) if (i+j) % 2 == 0)
+        odd_even = {
+            "odd": round(float(odd) * 100, 1),
+            "even": round(float(even) * 100, 1),
+        }
+
+        # Margin of Victory (Home)
+        margin_home = {
+            "by_1": round(float(sum(matrix[i, i-1] for i in range(1, min(11, len(matrix))))) * 100, 1),
+            "by_2": round(float(sum(matrix[i, i-2] for i in range(2, min(11, len(matrix))))) * 100, 1),
+            "by_3_plus": round(float(sum(matrix[i, j] for i in range(min(11, len(matrix)))
+                              for j in range(min(11, len(matrix[0]) if len(matrix) > 0 else 0)) if i - j >= 3)) * 100, 1),
+        }
+
+        # Team Exact Goals
+        home_exact = {str(g): round(float(np.sum(matrix[g, :])) * 100, 1) for g in range(min(5, len(matrix)))}
+        away_exact = {str(g): round(float(np.sum(matrix[:, g])) * 100, 1) for g in range(min(5, len(matrix[0]) if len(matrix) > 0 else 0))}
+
+        # Team Over Goals
+        home_o05 = 1 - float(np.sum(matrix[0, :])) if len(matrix) > 0 else 0.5
+        home_o15 = 1 - float(np.sum(matrix[0, :])) - float(np.sum(matrix[1, :])) if len(matrix) > 1 else 0.3
+        away_o05 = 1 - float(np.sum(matrix[:, 0])) if len(matrix) > 0 else 0.5
+        away_o15 = 1 - float(np.sum(matrix[:, 0])) - float(np.sum(matrix[:, 1])) if len(matrix) > 0 and len(matrix[0]) > 1 else 0.3
+
+        team_overs = {
+            "home_o05": round(home_o05 * 100, 1),
+            "home_o15": round(home_o15 * 100, 1),
+            "away_o05": round(away_o05 * 100, 1),
+            "away_o15": round(away_o15 * 100, 1),
+        }
+
         # Full analysis
         response["analysis"] = {
             "expected_goals": dc_predictions.get("expected_goals", {}),
@@ -350,22 +447,64 @@ async def get_match_analysis(
             "exact_scores": dc_predictions.get("exact_scores", [])[:10],
             "asian_handicaps": dc_predictions.get("asian_handicap", {}),
             "score_matrix": dc_predictions.get("score_matrix", []),
+            # Extended markets
+            "double_chance": double_chance,
+            "draw_no_bet": draw_no_bet,
+            "clean_sheet": clean_sheet,
+            "win_to_nil": win_to_nil,
+            "team_scores": team_scores,
+            "exact_totals": exact_totals,
+            "odd_even": odd_even,
+            "margin_home": margin_home,
+            "home_exact_goals": home_exact,
+            "away_exact_goals": away_exact,
+            "team_overs": team_overs,
         }
 
-        response["edges"] = [
-            {
-                "market": e.market,
-                "market_display": MARKET_NAMES.get(e.market, e.market),
-                "model_probability": round(e.model_probability * 100, 1),
-                "bookmaker_probability": round(e.bookmaker_probability * 100, 1),
-                "edge_percentage": round(e.edge_percentage, 1),
-                "best_odds": e.best_odds,
-                "risk_level": e.risk_level,
-                "kelly_stake": round(e.kelly_stake * 100, 1) if e.kelly_stake else 0,
-                "confidence": round(e.confidence * 100, 1),
-            }
-            for e in edges
+        # Calculate edges from LIVE Dixon-Coles predictions (not stored DB values)
+        # This ensures consistency between the table probabilities and recommended bets
+        live_edges = []
+
+        # Map of markets to odds and probabilities
+        market_configs = [
+            ("1x2_home", odds.home_win_odds if odds else None, p1x2.get("home_win", 0)),
+            ("1x2_draw", odds.draw_odds if odds else None, p1x2.get("draw", 0)),
+            ("1x2_away", odds.away_win_odds if odds else None, p1x2.get("away_win", 0)),
+            ("over_25", odds.over_25_odds if odds else None, dc_predictions.get("over_under", {}).get("over_2.5", 0)),
+            ("under_25", odds.under_25_odds if odds else None, dc_predictions.get("over_under", {}).get("under_2.5", 0)),
+            ("btts_yes", odds.btts_yes_odds if odds else None, dc_predictions.get("btts", {}).get("btts_yes", 0)),
+            ("btts_no", odds.btts_no_odds if odds else None, dc_predictions.get("btts", {}).get("btts_no", 0)),
         ]
+
+        for market, market_odds, model_prob in market_configs:
+            if market_odds and market_odds > 1 and model_prob > 0:
+                book_prob = 1 / market_odds
+                edge = ((model_prob - book_prob) / book_prob) * 100
+                kelly = ((model_prob * market_odds - 1) / (market_odds - 1)) * 0.5 if edge > 0 else 0
+
+                # Determine risk level based on probability
+                if model_prob >= 0.6:
+                    risk = "safe"
+                elif model_prob >= 0.4:
+                    risk = "medium"
+                else:
+                    risk = "risky"
+
+                live_edges.append({
+                    "market": market,
+                    "market_display": MARKET_NAMES.get(market, market),
+                    "model_probability": round(model_prob * 100, 1),
+                    "bookmaker_probability": round(book_prob * 100, 1),
+                    "edge_percentage": round(edge, 1),
+                    "best_odds": market_odds,
+                    "risk_level": risk,
+                    "kelly_stake": round(kelly * 100, 1) if kelly > 0 else 0,
+                    "confidence": round(model_prob * 100, 1),
+                })
+
+        # Sort by edge descending
+        live_edges.sort(key=lambda x: x["edge_percentage"], reverse=True)
+        response["edges"] = live_edges
 
         response["odds"] = {
             "bookmaker": odds.bookmaker if odds else "N/A",
@@ -378,17 +517,17 @@ async def get_match_analysis(
             "btts_no": odds.btts_no_odds if odds else None,
         }
 
-        # Recommended bets (edges > 5%)
+        # Recommended bets (edges > 5%) - uses live calculations for consistency
         response["recommendations"] = [
             {
-                "market": e.market,
-                "market_display": MARKET_NAMES.get(e.market, e.market),
-                "edge": round(e.edge_percentage, 1),
-                "odds": e.best_odds,
-                "stake": f"{round(e.kelly_stake * 100, 1)}%" if e.kelly_stake else "1%",
-                "risk": e.risk_level,
+                "market": e["market"],
+                "market_display": e["market_display"],
+                "edge": e["edge_percentage"],
+                "odds": e["best_odds"],
+                "stake": f"{e['kelly_stake']}%" if e["kelly_stake"] > 0 else "1%",
+                "risk": e["risk_level"],
             }
-            for e in edges if e.edge_percentage >= 5
+            for e in live_edges if e["edge_percentage"] >= 5
         ]
     else:
         # Preview only

@@ -81,7 +81,7 @@ def classify_risk(edge: float, confidence: float) -> str:
         return "risky"
 
 
-def kelly_criterion(prob: float, odds: float, fraction: float = 0.25) -> float:
+def kelly_criterion(prob: float, odds: float, fraction: float = 0.5) -> float:
     """Calculate Kelly criterion stake."""
     b = odds - 1
     q = 1 - prob
@@ -267,8 +267,8 @@ def sync_with_dixon_coles():
                 ("1x2_away", "away_win_odds", probs_1x2["away_win"], "Victoire extérieur"),
                 ("over_25", "over_25_odds", all_probs["over_25"], "Plus de 2.5 buts"),
                 ("under_25", "under_25_odds", all_probs["under_25"], "Moins de 2.5 buts"),
-                ("btts_yes", "btts_yes_odds", all_probs["btts_yes"], "Les deux équipes marquent"),
-                ("btts_no", "btts_no_odds", all_probs["btts_no"], "Au moins une équipe ne marque pas"),
+                ("btts_yes", "btts_yes_odds", all_probs["btts_yes"], "Les 2 équipes marquent"),
+                ("btts_no", "btts_no_odds", all_probs["btts_no"], "Les 2 ne marquent pas"),
             ]
 
             for market, odds_key, model_prob, display_name in markets:

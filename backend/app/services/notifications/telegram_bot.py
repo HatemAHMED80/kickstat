@@ -94,15 +94,15 @@ class TelegramBot:
             "risky": "🔴",
         }.get(edge.risk_level, "⚪")
 
-        # Market display name
+        # Market display name (consistent with rest of app)
         market_names = {
             "1x2_home": "Victoire domicile",
             "1x2_draw": "Match nul",
             "1x2_away": "Victoire extérieur",
             "over_25": "Plus de 2.5 buts",
             "under_25": "Moins de 2.5 buts",
-            "btts_yes": "Les deux équipes marquent",
-            "btts_no": "Au moins une équipe ne marque pas",
+            "btts_yes": "Les 2 équipes marquent",
+            "btts_no": "Les 2 ne marquent pas",
         }
         market_name = market_names.get(edge.market, edge.market)
 

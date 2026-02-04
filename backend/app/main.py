@@ -55,7 +55,7 @@ app = FastAPI(
 # CORS - allow all Vercel preview deployments and localhost
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://kickstat.vercel.app"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3003", "https://kickstat.vercel.app"],
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],

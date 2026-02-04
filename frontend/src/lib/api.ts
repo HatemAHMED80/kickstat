@@ -279,6 +279,46 @@ export interface MatchAnalysisResponse {
     exact_scores: ExactScore[];
     asian_handicaps: Record<string, number>;
     score_matrix: number[][];
+    // Extended markets (at same level as probabilities)
+    double_chance?: {
+      "1x": number;
+      "x2": number;
+      "12": number;
+    };
+    draw_no_bet?: {
+      home: number;
+      away: number;
+    };
+    clean_sheet?: {
+      home: number;
+      away: number;
+    };
+    win_to_nil?: {
+      home: number;
+      away: number;
+    };
+    team_scores?: {
+      home: number;
+      away: number;
+    };
+    exact_totals?: Record<string, number>;
+    odd_even?: {
+      odd: number;
+      even: number;
+    };
+    margin_home?: {
+      by_1: number;
+      by_2: number;
+      by_3_plus: number;
+    };
+    home_exact_goals?: Record<string, number>;
+    away_exact_goals?: Record<string, number>;
+    team_overs?: {
+      home_o05: number;
+      home_o15: number;
+      away_o05: number;
+      away_o15: number;
+    };
   };
   edges?: EdgeInfo[];
   odds?: {
