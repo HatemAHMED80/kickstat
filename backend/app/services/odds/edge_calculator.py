@@ -77,7 +77,7 @@ class EdgeCalculator:
         self,
         model_prob: float,
         decimal_odds: float,
-        fraction: float = 0.25,
+        fraction: float = 0.5,
     ) -> float:
         """
         Calculate recommended stake using Kelly Criterion.

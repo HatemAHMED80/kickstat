@@ -1,12 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getOpportunities, getMatchAnalysis, OpportunityResponse, MatchAnalysisResponse } from '@/lib/api';
+import { getOpportunities, getMatchAnalysis, getCompetitions, OpportunityResponse, MatchAnalysisResponse, CompetitionInfo } from '@/lib/api';
 
 type RiskFilter = 'all' | 'safe' | 'medium' | 'risky';
 
+// Country flag mapping
+const COUNTRY_FLAGS: Record<string, string> = {
+  'France': '🇫🇷',
+  'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Spain': '🇪🇸',
+  'Germany': '🇩🇪',
+  'Italy': '🇮🇹',
+};
+
 export default function DashboardPage() {
   const [filter, setFilter] = useState<RiskFilter>('all');
+  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
+  const [competitions, setCompetitions] = useState<CompetitionInfo[]>([]);
   const [opportunities, setOpportunities] = useState<OpportunityResponse[]>([]);
   const [total, setTotal] = useState(0);
   const [freePreviewCount, setFreePreviewCount] = useState(3);
@@ -18,6 +29,20 @@ export default function DashboardPage() {
   const [analysis, setAnalysis] = useState<MatchAnalysisResponse | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
 
+  // Fetch competitions on mount
+  useEffect(() => {
+    async function fetchCompetitions() {
+      try {
+        const data = await getCompetitions();
+        setCompetitions(data.competitions);
+      } catch (err) {
+        console.error('[Dashboard] Failed to fetch competitions:', err);
+      }
+    }
+    fetchCompetitions();
+  }, []);
+
+  // Fetch opportunities when filters change
   useEffect(() => {
     async function fetchOpportunities() {
       console.log("[Dashboard] Fetching opportunities...");
@@ -27,7 +52,8 @@ export default function DashboardPage() {
         const data = await getOpportunities({
           min_edge: 5,
           risk_level: filter === 'all' ? undefined : filter,
-          limit: 20,
+          competition: selectedLeague || undefined,
+          limit: 30,
         });
         console.log("[Dashboard] Got data:", data);
         setOpportunities(data.opportunities);
@@ -42,7 +68,7 @@ export default function DashboardPage() {
     }
 
     fetchOpportunities();
-  }, [filter]);
+  }, [filter, selectedLeague]);
 
   // Open analysis modal
   const openAnalysis = async (matchId: number) => {
@@ -80,9 +106,25 @@ export default function DashboardPage() {
           <span className="w-[3px] h-3 bg-green rounded" />
           Meilleures opportunités
         </h2>
-        <div className="flex gap-[3px]">
-          <TabButton active>Ligue 1</TabButton>
-          <TabButton>Ligue 2</TabButton>
+        <div className="flex gap-[3px] flex-wrap">
+          <LeagueButton
+            active={selectedLeague === null}
+            onClick={() => setSelectedLeague(null)}
+            count={total}
+          >
+            Tous
+          </LeagueButton>
+          {competitions.map((comp) => (
+            <LeagueButton
+              key={comp.id}
+              active={selectedLeague === comp.name}
+              onClick={() => setSelectedLeague(comp.name)}
+              flag={COUNTRY_FLAGS[comp.country]}
+              count={comp.match_count}
+            >
+              {comp.short_name}
+            </LeagueButton>
+          ))}
         </div>
       </div>
 
@@ -266,16 +308,35 @@ export default function DashboardPage() {
 // COMPONENTS
 // =============================================================================
 
-function TabButton({ children, active }: { children: React.ReactNode; active?: boolean }) {
+function LeagueButton({
+  children,
+  active,
+  onClick,
+  flag,
+  count,
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+  flag?: string;
+  count?: number;
+}) {
   return (
     <button
-      className={`font-mono text-[10px] px-[11px] py-1.5 rounded border transition-all ${
+      onClick={onClick}
+      className={`font-mono text-[10px] px-[11px] py-1.5 rounded border transition-all flex items-center gap-1.5 ${
         active
           ? 'bg-green-dark border-green text-green'
           : 'bg-transparent border-border text-text-2 hover:border-border-2 hover:text-text-1'
       }`}
     >
+      {flag && <span>{flag}</span>}
       {children}
+      {count !== undefined && (
+        <span className={`text-[8px] px-1 py-0.5 rounded ${active ? 'bg-green/20' : 'bg-bg-3'}`}>
+          {count}
+        </span>
+      )}
     </button>
   );
 }

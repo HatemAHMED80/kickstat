@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     user_agent: str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
     transfermarkt_rate_limit: int = 10
     understat_rate_limit: int = 20
+    fbref_rate_limit: float = 5.0  # FBref has strict rate limiting - 5 seconds between requests
 
     # Competition IDs (API-Football)
     ligue1_id: int = 61
