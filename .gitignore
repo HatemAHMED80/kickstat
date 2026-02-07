@@ -1,37 +1,37 @@
+# Environment
+.env
+.venv/
+venv/
+env/
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-venv/
-env/
-.env
 *.egg-info/
 dist/
 build/
+.eggs/
 
-# Node
-node_modules/
-.next/
-.vercel/
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_metadata/
 
-# IDE
-.idea/
-.vscode/
-*.swp
+# Data (raw data too large for git)
+data/raw/
+data/processed/*.pkl
+data/results/*.pkl
+
+# Models
+*.pickle
+*.joblib
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-*.sqlite3
-
-# Logs
-*.log
-
-# Local env files
-.env.local
-.env*.local
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

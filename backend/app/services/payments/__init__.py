@@ -1,4 +1,0 @@
-"""Payment services."""
-from .stripe_service import StripeService, get_stripe_service, SUBSCRIPTION_PLANS
-
-__all__ = ["StripeService", "get_stripe_service", "SUBSCRIPTION_PLANS"]
