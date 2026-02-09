@@ -46,11 +46,11 @@ interface MatchPrediction {
   home_stats?: TeamStats;
   away_stats?: TeamStats;
   h2h_stats?: H2HStats;
-  over_under?: { over_25: number; under_25: number };
-  over_under_odds?: { over_25: number; under_25: number };
-  over_under_edge?: { over_25: number; under_25: number };
-  btts?: { yes: number; no: number };
-  correct_score?: { [key: string]: number };
+  over_under?: { over_25: number; under_25: number } | null;
+  over_under_odds?: { over_25: number; under_25: number } | null;
+  over_under_edge?: { over_25: number; under_25: number } | null;
+  btts?: { yes: number; no: number } | null;
+  correct_score?: { [key: string]: number } | null;
   quality_score?: number | null;
   confidence_badge?: string | null;
 }
