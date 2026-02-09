@@ -1,0 +1,45 @@
+{
+  "elapsed_seconds": 763.1,
+  "total_matches": 892,
+  "matches_with_odds": 892,
+  "xgb_enabled": false,
+  "calibration": {
+    "brier_score": 0.5998,
+    "log_loss": 1.0027,
+    "ece": 0.0145,
+    "accuracy": 0.5202,
+    "is_acceptable": true
+  },
+  "betting": {
+    "total_bets": 962,
+    "wins": 290,
+    "win_rate": 0.3015,
+    "total_pnl": -33.12,
+    "roi": -0.0344,
+    "avg_edge": 21.3,
+    "median_edge": 17.2,
+    "by_market": {
+      "home": {
+        "bets": 297,
+        "wins": 102,
+        "win_rate": 0.343,
+        "pnl": -47.03,
+        "roi": -0.1584
+      },
+      "draw": {
+        "bets": 253,
+        "wins": 53,
+        "win_rate": 0.209,
+        "pnl": -22.7,
+        "roi": -0.0897
+      },
+      "away": {
+        "bets": 412,
+        "wins": 135,
+        "win_rate": 0.328,
+        "pnl": 36.61,
+        "roi": 0.0889
+      }
+    }
+  }
+}

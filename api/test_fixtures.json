@@ -1,0 +1,26 @@
+[
+  {
+    "home": "Nice",
+    "away": "Monaco",
+    "league": "Ligue 1",
+    "kickoff": "2026-02-09T20:00:00Z"
+  },
+  {
+    "home": "Paris SG",
+    "away": "Marseille",
+    "league": "Ligue 1",
+    "kickoff": "2026-02-09T20:45:00Z"
+  },
+  {
+    "home": "Lyon",
+    "away": "Lille",
+    "league": "Ligue 1",
+    "kickoff": "2026-02-09T17:00:00Z"
+  },
+  {
+    "home": "Liverpool",
+    "away": "Man City",
+    "league": "Premier League",
+    "kickoff": "2026-02-09T16:30:00Z"
+  }
+]

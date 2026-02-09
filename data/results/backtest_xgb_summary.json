@@ -1,0 +1,63 @@
+{
+  "elapsed_seconds": 866.3,
+  "total_matches": 872,
+  "matches_with_odds": 872,
+  "xgb_enabled": true,
+  "calibration": {
+    "brier_score": 0.6123,
+    "log_loss": 1.0223,
+    "ece": 0.0396,
+    "accuracy": 0.5218,
+    "is_acceptable": true
+  },
+  "betting": {
+    "total_bets": 1153,
+    "wins": 296,
+    "win_rate": 0.2567,
+    "total_pnl": -36.8,
+    "roi": -0.0319,
+    "avg_edge": 32.8,
+    "median_edge": 22.6,
+    "by_market": {
+      "home": {
+        "bets": 291,
+        "wins": 88,
+        "win_rate": 0.302,
+        "pnl": -49.1,
+        "roi": -0.1687
+      },
+      "draw": {
+        "bets": 429,
+        "wins": 93,
+        "win_rate": 0.217,
+        "pnl": -22.25,
+        "roi": -0.0519
+      },
+      "away": {
+        "bets": 433,
+        "wins": 115,
+        "win_rate": 0.266,
+        "pnl": 34.55,
+        "roi": 0.0798
+      }
+    }
+  },
+  "xgb_train_samples": 672,
+  "feature_importance": {
+    "elo_diff": "0.0749",
+    "elo_home_prob": "0.0537",
+    "elo_away_prob": "0.0467",
+    "dc_away_prob": "0.0461",
+    "dc_home_prob": "0.0264",
+    "ppg_diff": "0.0255",
+    "home_sot_ratio_5": "0.0249",
+    "home_sot_pg_5": "0.0242",
+    "home_goals_conceded_5": "0.0235",
+    "dc_away_attack": "0.0234",
+    "sot_diff": "0.0228",
+    "away_goals_conceded_5": "0.0218",
+    "home_fouls_pg_5": "0.0212",
+    "dc_home_defense": "0.0212",
+    "away_ppg_5": "0.0211"
+  }
+}

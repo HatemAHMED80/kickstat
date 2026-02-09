@@ -112,11 +112,13 @@ class WalkForwardBacktest:
         min_edge_pct: float = 5.0,
         dc_weight: float = 0.65,
         elo_weight: float = 0.35,
+        refit_interval: int = 30,
     ):
         self.min_training = min_training_matches
         self.min_edge = min_edge_pct
         self.dc_weight = dc_weight
         self.elo_weight = elo_weight
+        self.refit_interval = refit_interval
 
     def run(
         self,
@@ -144,40 +146,55 @@ class WalkForwardBacktest:
         betting_results = []
         edges_found = 0
 
+        def _parse_date(kickoff):
+            if isinstance(kickoff, str):
+                return datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+            return kickoff
+
+        # Build ELO incrementally up to min_training
+        elo = EloRating()
+        for m in matches[: self.min_training]:
+            elo.update(EloMatch(
+                home_team=m["home_team"],
+                away_team=m["away_team"],
+                home_goals=m["home_score"],
+                away_goals=m["away_score"],
+            ))
+
+        dc = None  # Will be fitted on first iteration
+
         for i in range(self.min_training, n):
-            # Training data: everything before this match
             train_matches = matches[:i]
             test_match = matches[i]
 
-            # Build training MatchResults for Dixon-Coles
-            dc_train = [
-                MatchResult(
-                    home_team=m["home_team"],
-                    away_team=m["away_team"],
-                    home_goals=m["home_score"],
-                    away_goals=m["away_score"],
-                    date=datetime.fromisoformat(m["kickoff"].replace("Z", "+00:00"))
-                    if isinstance(m["kickoff"], str)
-                    else m["kickoff"],
-                )
-                for m in train_matches
-            ]
+            # Re-fit Dixon-Coles every N matches (expensive)
+            if dc is None or (i - self.min_training) % self.refit_interval == 0:
+                dc_train = [
+                    MatchResult(
+                        home_team=m["home_team"],
+                        away_team=m["away_team"],
+                        home_goals=m["home_score"],
+                        away_goals=m["away_score"],
+                        date=_parse_date(m["kickoff"]),
+                    )
+                    for m in train_matches
+                ]
+                dc = DixonColesModel()
+                try:
+                    dc.fit(dc_train)
+                except ValueError:
+                    continue
+                if (i - self.min_training) % 50 == 0:
+                    logger.info(f"Backtest progress: {i}/{n} matches")
 
-            # Fit Dixon-Coles
-            dc = DixonColesModel()
-            try:
-                dc.fit(dc_train)
-            except ValueError as e:
-                continue
-
-            # Fit ELO
-            elo = EloRating()
-            for m in train_matches:
+            # Update ELO incrementally (skip first iteration - already done in init)
+            if i > self.min_training:
+                prev = matches[i - 1]
                 elo.update(EloMatch(
-                    home_team=m["home_team"],
-                    away_team=m["away_team"],
-                    home_goals=m["home_score"],
-                    away_goals=m["away_score"],
+                    home_team=prev["home_team"],
+                    away_team=prev["away_team"],
+                    home_goals=prev["home_score"],
+                    away_goals=prev["away_score"],
                 ))
 
             # Predict
@@ -199,7 +216,8 @@ class WalkForwardBacktest:
             all_outcomes.append(outcome)
 
             # Edge calculation (if odds available)
-            match_key = f"{test_match['home_team']}_vs_{test_match['away_team']}"
+            date_str = str(test_match["kickoff"])[:10]
+            match_key = f"{test_match['home_team']}_vs_{test_match['away_team']}_{date_str}"
             if odds_data and match_key in odds_data:
                 odds = odds_data[match_key]
                 from ..data.odds_api import remove_margin
@@ -211,9 +229,12 @@ class WalkForwardBacktest:
                 )
 
                 markets = [
-                    ("home", pred.home_prob, fair["home"], odds.get("home_odds", 0)),
-                    ("draw", pred.draw_prob, fair["draw"], odds.get("draw_odds", 0)),
-                    ("away", pred.away_prob, fair["away"], odds.get("away_odds", 0)),
+                    ("home", pred.home_prob, fair["home"],
+                     odds.get("best_home", odds.get("home_odds", 0))),
+                    ("draw", pred.draw_prob, fair["draw"],
+                     odds.get("best_draw", odds.get("draw_odds", 0))),
+                    ("away", pred.away_prob, fair["away"],
+                     odds.get("best_away", odds.get("away_odds", 0))),
                 ]
 
                 for market_name, model_p, fair_p, best_odds in markets:

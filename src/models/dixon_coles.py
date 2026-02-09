@@ -191,7 +191,7 @@ class DixonColesModel:
         bounds = (
             [(0.2, 3.0)] * n_teams      # attacks
             + [(0.2, 3.0)] * n_teams     # defenses
-            + [(0.0, 0.5)]               # home advantage
+            + [(0.10, 0.45)]             # home advantage (min 0.10 - always exists in football)
             + [(-0.3, 0.0)]              # rho
         )
 

@@ -73,15 +73,19 @@ class OddsAPIClient:
 def extract_best_odds(match_odds: dict) -> dict:
     """Extract best available odds across all bookmakers for a match.
 
-    Returns dict with keys: home, draw, away, over25, under25
+    Returns dict with keys: home, draw, away, over15, under15, over25, under25, over35, under35
     and their associated best bookmaker.
     """
     best = {
         "home": {"odds": 0, "bookmaker": None},
         "draw": {"odds": 0, "bookmaker": None},
         "away": {"odds": 0, "bookmaker": None},
+        "over15": {"odds": 0, "bookmaker": None},
+        "under15": {"odds": 0, "bookmaker": None},
         "over25": {"odds": 0, "bookmaker": None},
         "under25": {"odds": 0, "bookmaker": None},
+        "over35": {"odds": 0, "bookmaker": None},
+        "under35": {"odds": 0, "bookmaker": None},
     }
 
     for bookmaker in match_odds.get("bookmakers", []):
@@ -101,8 +105,18 @@ def extract_best_odds(match_odds: dict) -> dict:
             elif market["key"] == "totals":
                 for outcome in market["outcomes"]:
                     point = outcome.get("point", 2.5)
-                    if point == 2.5:
-                        key = "over25" if outcome["name"] == "Over" else "under25"
+                    is_over = outcome["name"] == "Over"
+
+                    if point == 1.5:
+                        key = "over15" if is_over else "under15"
+                        if outcome["price"] > best[key]["odds"]:
+                            best[key] = {"odds": outcome["price"], "bookmaker": name}
+                    elif point == 2.5:
+                        key = "over25" if is_over else "under25"
+                        if outcome["price"] > best[key]["odds"]:
+                            best[key] = {"odds": outcome["price"], "bookmaker": name}
+                    elif point == 3.5:
+                        key = "over35" if is_over else "under35"
                         if outcome["price"] > best[key]["odds"]:
                             best[key] = {"odds": outcome["price"], "bookmaker": name}
 

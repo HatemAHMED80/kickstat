@@ -56,10 +56,10 @@ class EnsemblePrediction:
 
 
 class EnsemblePredictor:
-    """Weighted ensemble of Dixon-Coles + ELO.
+    """Weighted ensemble of Dixon-Coles + ELO, with optional XGBoost stacking.
 
-    Start simple with 2 models. Add XGBoost only if it improves
-    Brier score on the walk-forward backtest.
+    When XGBoost is available and fitted, it replaces the weighted average
+    for 1X2 probabilities. Falls back to DC+ELO weighted average otherwise.
     """
 
     def __init__(
@@ -68,33 +68,53 @@ class EnsemblePredictor:
         elo_model: EloRating,
         dc_weight: float = 0.65,
         elo_weight: float = 0.35,
+        xgb_model=None,
     ):
         self.dc = dc_model
         self.elo = elo_model
         self.weights = {"dixon_coles": dc_weight, "elo": elo_weight}
+        self.xgb = xgb_model
 
-    def predict(self, home_team: str, away_team: str) -> EnsemblePrediction:
-        """Generate ensemble prediction."""
-        # Dixon-Coles prediction (full markets)
+    def predict(
+        self,
+        home_team: str,
+        away_team: str,
+        match_features: dict[str, float] | None = None,
+    ) -> EnsemblePrediction:
+        """Generate ensemble prediction.
+
+        If XGBoost model is available and match_features provided,
+        uses XGBoost for 1X2. Otherwise falls back to weighted average.
+        """
+        # Dixon-Coles prediction (always needed for over/under + BTTS)
         dc_pred = self.dc.predict(home_team, away_team)
         dc_probs = {"home": dc_pred.home_win, "draw": dc_pred.draw, "away": dc_pred.away_win}
 
         # ELO prediction (1X2 only)
         elo_probs = self.elo.predict_1x2(home_team, away_team)
 
-        # Weighted average for 1X2
-        w_dc = self.weights["dixon_coles"]
-        w_elo = self.weights["elo"]
+        # XGBoost stacking path
+        if self.xgb is not None and self.xgb.is_fitted and match_features is not None:
+            xgb_probs = self.xgb.predict_proba(match_features)
+            home = float(xgb_probs[0])
+            draw = float(xgb_probs[1])
+            away = float(xgb_probs[2])
+            used_weights = {"xgboost": 1.0}
+        else:
+            # Fallback: weighted average of DC + ELO
+            w_dc = self.weights["dixon_coles"]
+            w_elo = self.weights["elo"]
 
-        home = w_dc * dc_probs["home"] + w_elo * elo_probs["home"]
-        draw = w_dc * dc_probs["draw"] + w_elo * elo_probs["draw"]
-        away = w_dc * dc_probs["away"] + w_elo * elo_probs["away"]
+            home = w_dc * dc_probs["home"] + w_elo * elo_probs["home"]
+            draw = w_dc * dc_probs["draw"] + w_elo * elo_probs["draw"]
+            away = w_dc * dc_probs["away"] + w_elo * elo_probs["away"]
 
-        # Normalize
-        total = home + draw + away
-        home /= total
-        draw /= total
-        away /= total
+            # Normalize
+            total = home + draw + away
+            home /= total
+            draw /= total
+            away /= total
+            used_weights = self.weights
 
         # Model agreement: 1 = perfect agreement, 0 = maximum disagreement
         probs_dc = np.array([dc_probs["home"], dc_probs["draw"], dc_probs["away"]])
@@ -112,5 +132,5 @@ class EnsemblePredictor:
             model_agreement=agreement,
             dc_probs=dc_probs,
             elo_probs=elo_probs,
-            weights=self.weights,
+            weights=used_weights,
         )

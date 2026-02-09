@@ -1,0 +1,29 @@
+{
+  "date_execution": "2026-02-07T12:52:12",
+  "source_donnees": "Reel (data/raw/)",
+  "config": {
+    "min_training_matches": 100,
+    "min_edge_pct": 5.0,
+    "dc_weight": 0.65,
+    "elo_weight": 0.35,
+    "refit_interval": 30
+  },
+  "calibration": {
+    "brier_score": 0.5975,
+    "log_loss": 1.0018,
+    "ece": 0.0226,
+    "accuracy": 0.528,
+    "n_predictions": 511,
+    "is_acceptable": true
+  },
+  "paris": {
+    "total_edges": 0,
+    "n_paris": 0,
+    "win_rate": 0.0,
+    "avg_edge": 0.0,
+    "roi": 0.0,
+    "pnl_total": 0.0
+  },
+  "decision": "GO (calibration)",
+  "note": "Pas de cotes historiques disponibles. ROI non evalue. Calibration seule validee."
+}

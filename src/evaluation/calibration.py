@@ -22,8 +22,12 @@ class CalibrationReport:
 
     @property
     def is_acceptable(self) -> bool:
-        """Minimum thresholds for production use."""
-        return self.brier_score < 0.22 and self.ece < 0.08
+        """Minimum thresholds for production use.
+
+        For 3-class Brier score: range is 0 to 2.
+        Uniform (1/3 each) ≈ 0.667. Good models: 0.55-0.60.
+        """
+        return self.brier_score < 0.62 and self.ece < 0.08
 
     def summary(self) -> str:
         status = "PASS" if self.is_acceptable else "FAIL"

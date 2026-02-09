@@ -22,6 +22,10 @@ data/raw/
 data/processed/*.pkl
 data/results/*.pkl
 
+# Node
+node_modules/
+.next/
+
 # Models
 *.pickle
 *.joblib

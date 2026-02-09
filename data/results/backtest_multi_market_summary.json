@@ -1,0 +1,398 @@
+[
+  {
+    "league": "ligue_1",
+    "matches_total": 992,
+    "matches_tested": 912,
+    "elapsed_seconds": 380.1,
+    "by_market": {
+      "1x2": {
+        "bets": 1004,
+        "wins": 296,
+        "win_rate": 0.2948,
+        "total_pnl": -46.07,
+        "roi": -0.0459,
+        "avg_edge": 22.6,
+        "median_edge": 17.6
+      },
+      "ou25": {
+        "bets": 689,
+        "wins": 346,
+        "win_rate": 0.5022,
+        "total_pnl": -0.1,
+        "roi": -0.0001,
+        "avg_edge": 17.9,
+        "median_edge": 15.0
+      },
+      "corner_1x2": {
+        "bets": 1075,
+        "wins": 440,
+        "win_rate": 0.4093,
+        "total_pnl": 381.96,
+        "roi": 0.3553,
+        "avg_edge": 88.1,
+        "median_edge": 57.9
+      },
+      "corner_ou": {
+        "bets": 832,
+        "wins": 403,
+        "win_rate": 0.4844,
+        "total_pnl": 32.08,
+        "roi": 0.0386,
+        "avg_edge": 44.0,
+        "median_edge": 37.4
+      }
+    }
+  },
+  {
+    "league": "ligue_2",
+    "matches_total": 1065,
+    "matches_tested": 985,
+    "elapsed_seconds": 536.2,
+    "by_market": {
+      "1x2": {
+        "bets": 1026,
+        "wins": 321,
+        "win_rate": 0.3129,
+        "total_pnl": -50.04,
+        "roi": -0.0488,
+        "avg_edge": 24.4,
+        "median_edge": 19.8
+      },
+      "ou25": {
+        "bets": 732,
+        "wins": 340,
+        "win_rate": 0.4645,
+        "total_pnl": -53.49,
+        "roi": -0.0731,
+        "avg_edge": 19.2,
+        "median_edge": 15.5
+      },
+      "corner_1x2": {
+        "bets": 1213,
+        "wins": 543,
+        "win_rate": 0.4477,
+        "total_pnl": 404.23,
+        "roi": 0.3332,
+        "avg_edge": 71.1,
+        "median_edge": 55.8
+      },
+      "corner_ou": {
+        "bets": 915,
+        "wins": 467,
+        "win_rate": 0.5104,
+        "total_pnl": 23.59,
+        "roi": 0.0258,
+        "avg_edge": 39.8,
+        "median_edge": 34.0
+      }
+    }
+  },
+  {
+    "league": "championship",
+    "matches_total": 1656,
+    "matches_tested": 1576,
+    "elapsed_seconds": 1989.1,
+    "by_market": {
+      "1x2": {
+        "bets": 1599,
+        "wins": 517,
+        "win_rate": 0.3233,
+        "total_pnl": -23.84,
+        "roi": -0.0149,
+        "avg_edge": 24.3,
+        "median_edge": 18.1
+      },
+      "ou25": {
+        "bets": 1175,
+        "wins": 583,
+        "win_rate": 0.4962,
+        "total_pnl": -36.26,
+        "roi": -0.0309,
+        "avg_edge": 16.3,
+        "median_edge": 13.3
+      },
+      "corner_1x2": {
+        "bets": 1889,
+        "wins": 907,
+        "win_rate": 0.4801,
+        "total_pnl": 625.58,
+        "roi": 0.3312,
+        "avg_edge": 69.4,
+        "median_edge": 53.4
+      },
+      "corner_ou": {
+        "bets": 1459,
+        "wins": 750,
+        "win_rate": 0.5141,
+        "total_pnl": 84.75,
+        "roi": 0.0581,
+        "avg_edge": 42.5,
+        "median_edge": 38.9
+      }
+    }
+  },
+  {
+    "league": "super_lig",
+    "matches_total": 1064,
+    "matches_tested": 984,
+    "elapsed_seconds": 598.2,
+    "by_market": {
+      "1x2": {
+        "bets": 984,
+        "wins": 323,
+        "win_rate": 0.3283,
+        "total_pnl": -101.74,
+        "roi": -0.1034,
+        "avg_edge": 26.1,
+        "median_edge": 19.7
+      },
+      "ou25": {
+        "bets": 727,
+        "wins": 345,
+        "win_rate": 0.4746,
+        "total_pnl": -44.48,
+        "roi": -0.0612,
+        "avg_edge": 17.4,
+        "median_edge": 13.4
+      },
+      "corner_1x2": {
+        "bets": 1109,
+        "wins": 469,
+        "win_rate": 0.4229,
+        "total_pnl": 374.87,
+        "roi": 0.338,
+        "avg_edge": 87.9,
+        "median_edge": 59.1
+      },
+      "corner_ou": {
+        "bets": 885,
+        "wins": 439,
+        "win_rate": 0.496,
+        "total_pnl": 55.19,
+        "roi": 0.0624,
+        "avg_edge": 46.4,
+        "median_edge": 36.8
+      }
+    }
+  },
+  {
+    "league": "super_league_greece",
+    "matches_total": 713,
+    "matches_tested": 633,
+    "elapsed_seconds": 150.0,
+    "by_market": {
+      "1x2": {
+        "bets": 740,
+        "wins": 205,
+        "win_rate": 0.277,
+        "total_pnl": -93.4,
+        "roi": -0.1262,
+        "avg_edge": 28.6,
+        "median_edge": 19.0
+      },
+      "ou25": {
+        "bets": 498,
+        "wins": 248,
+        "win_rate": 0.498,
+        "total_pnl": -4.0,
+        "roi": -0.008,
+        "avg_edge": 18.8,
+        "median_edge": 15.6
+      },
+      "corner_1x2": {
+        "bets": 762,
+        "wins": 309,
+        "win_rate": 0.4055,
+        "total_pnl": 265.16,
+        "roi": 0.348,
+        "avg_edge": 99.5,
+        "median_edge": 57.2
+      },
+      "corner_ou": {
+        "bets": 594,
+        "wins": 330,
+        "win_rate": 0.5556,
+        "total_pnl": 53.73,
+        "roi": 0.0905,
+        "avg_edge": 46.9,
+        "median_edge": 41.8
+      }
+    }
+  },
+  {
+    "league": "eredivisie",
+    "matches_total": 918,
+    "matches_tested": 838,
+    "elapsed_seconds": 390.0,
+    "by_market": {
+      "1x2": {
+        "bets": 931,
+        "wins": 277,
+        "win_rate": 0.2975,
+        "total_pnl": -41.55,
+        "roi": -0.0446,
+        "avg_edge": 26.6,
+        "median_edge": 17.6
+      },
+      "ou25": {
+        "bets": 635,
+        "wins": 311,
+        "win_rate": 0.4898,
+        "total_pnl": -42.12,
+        "roi": -0.0663,
+        "avg_edge": 17.2,
+        "median_edge": 14.5
+      },
+      "corner_1x2": {
+        "bets": 971,
+        "wins": 400,
+        "win_rate": 0.4119,
+        "total_pnl": 227.38,
+        "roi": 0.2342,
+        "avg_edge": 101.0,
+        "median_edge": 59.2
+      },
+      "corner_ou": {
+        "bets": 758,
+        "wins": 357,
+        "win_rate": 0.471,
+        "total_pnl": -13.59,
+        "roi": -0.0179,
+        "avg_edge": 44.5,
+        "median_edge": 35.4
+      }
+    }
+  },
+  {
+    "league": "jupiler_league",
+    "matches_total": 930,
+    "matches_tested": 850,
+    "elapsed_seconds": 403.7,
+    "by_market": {
+      "1x2": {
+        "bets": 861,
+        "wins": 273,
+        "win_rate": 0.3171,
+        "total_pnl": -66.66,
+        "roi": -0.0774,
+        "avg_edge": 21.1,
+        "median_edge": 16.2
+      },
+      "ou25": {
+        "bets": 657,
+        "wins": 319,
+        "win_rate": 0.4855,
+        "total_pnl": -29.71,
+        "roi": -0.0452,
+        "avg_edge": 16.6,
+        "median_edge": 14.5
+      },
+      "corner_1x2": {
+        "bets": 973,
+        "wins": 414,
+        "win_rate": 0.4255,
+        "total_pnl": 320.4,
+        "roi": 0.3293,
+        "avg_edge": 85.5,
+        "median_edge": 59.3
+      },
+      "corner_ou": {
+        "bets": 774,
+        "wins": 364,
+        "win_rate": 0.4703,
+        "total_pnl": -19.96,
+        "roi": -0.0258,
+        "avg_edge": 42.6,
+        "median_edge": 36.1
+      }
+    }
+  },
+  {
+    "league": "primeira_liga",
+    "matches_total": 918,
+    "matches_tested": 838,
+    "elapsed_seconds": 360.5,
+    "by_market": {
+      "1x2": {
+        "bets": 904,
+        "wins": 258,
+        "win_rate": 0.2854,
+        "total_pnl": -109.61,
+        "roi": -0.1212,
+        "avg_edge": 30.6,
+        "median_edge": 19.5
+      },
+      "ou25": {
+        "bets": 663,
+        "wins": 306,
+        "win_rate": 0.4615,
+        "total_pnl": -51.4,
+        "roi": -0.0775,
+        "avg_edge": 19.4,
+        "median_edge": 15.5
+      },
+      "corner_1x2": {
+        "bets": 983,
+        "wins": 403,
+        "win_rate": 0.41,
+        "total_pnl": 301.31,
+        "roi": 0.3065,
+        "avg_edge": 109.4,
+        "median_edge": 65.6
+      },
+      "corner_ou": {
+        "bets": 767,
+        "wins": 382,
+        "win_rate": 0.498,
+        "total_pnl": 8.23,
+        "roi": 0.0107,
+        "avg_edge": 40.6,
+        "median_edge": 36.1
+      }
+    }
+  },
+  {
+    "league": "serie_b",
+    "matches_total": 1140,
+    "matches_tested": 1060,
+    "elapsed_seconds": 749.1,
+    "by_market": {
+      "1x2": {
+        "bets": 1079,
+        "wins": 329,
+        "win_rate": 0.3049,
+        "total_pnl": -93.99,
+        "roi": -0.0871,
+        "avg_edge": 26.7,
+        "median_edge": 20.3
+      },
+      "ou25": {
+        "bets": 825,
+        "wins": 376,
+        "win_rate": 0.4558,
+        "total_pnl": -60.97,
+        "roi": -0.0739,
+        "avg_edge": 18.4,
+        "median_edge": 15.7
+      },
+      "corner_1x2": {
+        "bets": 1323,
+        "wins": 603,
+        "win_rate": 0.4558,
+        "total_pnl": 527.02,
+        "roi": 0.3984,
+        "avg_edge": 75.4,
+        "median_edge": 58.9
+      },
+      "corner_ou": {
+        "bets": 961,
+        "wins": 458,
+        "win_rate": 0.4766,
+        "total_pnl": -18.55,
+        "roi": -0.0193,
+        "avg_edge": 38.8,
+        "median_edge": 33.1
+      }
+    }
+  }
+]
