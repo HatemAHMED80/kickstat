@@ -31,18 +31,18 @@ interface Prediction {
   confidence_badge?: string | null;
   is_european?: boolean;
   prediction_source?: string;
-  bandit_recommendation?: BanditRecommendation | null;
-  over_under_15?: { over_15: number; under_15: number } | null;
-  over_under_15_edge?: { over_15: number; under_15: number } | null;
-  over_under?: { over_25: number; under_25: number } | null;
-  over_under_edge?: { over_25: number; under_25: number } | null;
-  over_under_35?: { over_35: number; under_35: number } | null;
-  over_under_35_edge?: { over_35: number; under_35: number } | null;
-  btts?: { yes: number; no: number } | null;
-  correct_score?: { [key: string]: number } | null;
-  double_chance?: { '1x': number; 'x2': number; '12': number } | null;
-  draw_no_bet?: { home: number | null; away: number | null } | null;
-  spreads?: { home_m15: number | null; home_m25: number | null } | null;
+  bandit_recommendation?: BanditRecommendation;
+  over_under_15?: { over_15: number; under_15: number };
+  over_under_15_edge?: { over_15: number; under_15: number };
+  over_under?: { over_25: number; under_25: number };
+  over_under_edge?: { over_25: number; under_25: number };
+  over_under_35?: { over_35: number; under_35: number };
+  over_under_35_edge?: { over_35: number; under_35: number };
+  btts?: { yes: number; no: number };
+  correct_score?: { [key: string]: number };
+  double_chance?: { '1x': number; 'x2': number; '12': number };
+  draw_no_bet?: { home: number | null; away: number | null };
+  spreads?: { home_m15: number | null; home_m25: number | null };
 }
 
 interface ComboLeg {
