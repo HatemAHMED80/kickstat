@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '../contexts/auth-context';
 
+// TODO: réactiver useAuth dans la NavBar avant la prod
 export default function NavBar() {
-  const { user, loading, signOut } = useAuth();
   const pathname = usePathname();
 
   const linkClass = (href: string) =>
@@ -20,36 +19,12 @@ export default function NavBar() {
           Kickstat
         </Link>
         <div className="flex items-center gap-1">
+          <Link href="/dashboard" className={linkClass('/dashboard')}>
+            Dashboard
+          </Link>
           <Link href="/historique" className={linkClass('/historique')}>
             Historique
           </Link>
-          {loading ? (
-            <div className="w-16 h-8" />
-          ) : user ? (
-            <>
-              <Link href="/dashboard" className={linkClass('/dashboard')}>
-                Dashboard
-              </Link>
-              <button
-                onClick={() => signOut()}
-                className="text-sm text-zinc-500 hover:text-red-400 transition px-3 py-1.5"
-              >
-                Déconnexion
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="text-sm text-zinc-500 hover:text-white transition px-3 py-1.5">
-                Connexion
-              </Link>
-              <Link
-                href="/signup"
-                className="text-sm font-medium px-4 py-1.5 rounded-md bg-violet-600 hover:bg-violet-500 text-white transition"
-              >
-                S&apos;inscrire
-              </Link>
-            </>
-          )}
         </div>
       </div>
     </nav>

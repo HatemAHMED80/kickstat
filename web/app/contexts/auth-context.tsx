@@ -86,31 +86,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const supabase = getSupabase();
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      setSession(initialSession);
-      if (initialSession?.user) {
-        fetchUserProfile(initialSession.user, initialSession.access_token);
-      }
-      setLoading(false);
-    }).catch(() => {
-      setLoading(false);
-    });
+    try {
+      const supabase = getSupabase();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        setSession(newSession);
-        if (newSession?.user) {
-          await fetchUserProfile(newSession.user, newSession.access_token);
-        } else {
-          setUser(null);
+      supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+        setSession(initialSession);
+        if (initialSession?.user) {
+          fetchUserProfile(initialSession.user, initialSession.access_token);
         }
         setLoading(false);
-      }
-    );
+      }).catch(() => {
+        setLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+      const { data } = supabase.auth.onAuthStateChange(
+        async (event, newSession) => {
+          setSession(newSession);
+          if (newSession?.user) {
+            await fetchUserProfile(newSession.user, newSession.access_token);
+          } else {
+            setUser(null);
+          }
+          setLoading(false);
+        }
+      );
+      subscription = data.subscription;
+    } catch {
+      // Supabase not configured — skip auth, render children normally
+      setLoading(false);
+    }
+
+    return () => subscription?.unsubscribe();
   }, []);
 
   const signOut = async () => {
