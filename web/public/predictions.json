@@ -1,0 +1,1572 @@
+{
+  "predictions": [
+    {
+      "match_id": "marseille_vs_lyon_2026-03-01",
+      "home_team": "Marseille",
+      "away_team": "Lyon",
+      "kickoff": "2026-03-01T19:45:00Z",
+      "model_probs": {
+        "home": 0.424,
+        "draw": 0.238,
+        "away": 0.338
+      },
+      "best_odds": {
+        "home": 2.05,
+        "draw": 3.8,
+        "away": 4.0,
+        "over25": 1.88,
+        "under25": 2.07,
+        "ah_home": 2.04,
+        "ah_away": 1.94
+      },
+      "bookmaker": {
+        "home": "Parions Sport (FR)",
+        "draw": "Betfair",
+        "away": "Betfair",
+        "over25": "1xBet",
+        "under25": "1xBet",
+        "ah_home": "Matchbook",
+        "ah_away": "Pinnacle"
+      },
+      "edge": {
+        "home": -6.4,
+        "draw": -2.5,
+        "away": 8.8,
+        "over25": 17.3,
+        "under25": -18.8,
+        "ah_home": 0.2,
+        "ah_away": -0.2
+      },
+      "recommended_bet": "over25",
+      "kelly_stake": 5.6,
+      "segment": "Balanced",
+      "quality_score": 0.8,
+      "confidence_badge": "SAFE",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.894,
+        "under_15": 0.106
+      },
+      "over_under": {
+        "over_25": 0.705,
+        "under_25": 0.295
+      },
+      "over_under_35": {
+        "over_35": 0.522,
+        "under_35": 0.478
+      },
+      "btts": {
+        "yes": 0.654,
+        "no": 0.346
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.662,
+        "x2": 0.576,
+        "12": 0.762
+      },
+      "draw_no_bet": {
+        "home": 0.556,
+        "away": 0.444
+      },
+      "spreads": {
+        "home_m15": 0.282,
+        "home_m25": 0.135
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 1.0,
+        "goals_scored_avg": 1.4,
+        "goals_conceded_avg": 2.4,
+        "shots_per_game": 12.8,
+        "shots_on_target_per_game": 4.4,
+        "shot_accuracy": 34.4,
+        "corners_per_game": 3.0,
+        "dominance_score": 0.512,
+        "recent_form": "LDLDW",
+        "recent_matches": [
+          {
+            "date": "20/02/26",
+            "opponent": "Brest",
+            "score": "0-2",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Strasbourg",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Paris SG",
+            "score": "0-5",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "31/01/26",
+            "opponent": "Paris FC",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "24/01/26",
+            "opponent": "Lens",
+            "score": "3-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 2.4,
+        "goals_scored_avg": 2.0,
+        "goals_conceded_avg": 1.0,
+        "shots_per_game": 8.0,
+        "shots_on_target_per_game": 3.8,
+        "shot_accuracy": 47.5,
+        "corners_per_game": 4.0,
+        "dominance_score": 0.463,
+        "recent_form": "LWWWW",
+        "recent_matches": [
+          {
+            "date": "22/02/26",
+            "opponent": "Strasbourg",
+            "score": "1-3",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "15/02/26",
+            "opponent": "Nice",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "07/02/26",
+            "opponent": "Nantes",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Lille",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Metz",
+            "score": "5-2",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "Ligue 1",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/516.png",
+      "away_crest": "https://crests.football-data.org/523.png"
+    },
+    {
+      "match_id": "betis_vs_sevilla_2026-03-01",
+      "home_team": "Betis",
+      "away_team": "Sevilla",
+      "kickoff": "2026-03-01T17:30:00Z",
+      "model_probs": {
+        "home": 0.474,
+        "draw": 0.343,
+        "away": 0.184
+      },
+      "best_odds": {
+        "home": 1.84,
+        "draw": 3.85,
+        "away": 5.14,
+        "over25": 2.04,
+        "under25": 1.91,
+        "ah_home": 2.98,
+        "ah_away": 1.94
+      },
+      "bookmaker": {
+        "home": "Betfair",
+        "draw": "Matchbook",
+        "away": "Pinnacle",
+        "over25": "Coolbet",
+        "under25": "1xBet",
+        "ah_home": "1xBet",
+        "ah_away": "Pinnacle"
+      },
+      "edge": {
+        "home": -7.1,
+        "draw": 8.2,
+        "away": -1.1,
+        "over25": 21.0,
+        "under25": -22.4,
+        "ah_home": -2.2,
+        "ah_away": 2.2
+      },
+      "recommended_bet": "over25",
+      "kelly_stake": 6.2,
+      "segment": "Balanced",
+      "quality_score": 1.1,
+      "confidence_badge": "SAFE",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.893,
+        "under_15": 0.107
+      },
+      "over_under": {
+        "over_25": 0.7,
+        "under_25": 0.3
+      },
+      "over_under_35": {
+        "over_35": 0.412,
+        "under_35": 0.588
+      },
+      "btts": {
+        "yes": 0.704,
+        "no": 0.296
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.816,
+        "x2": 0.526,
+        "12": 0.657
+      },
+      "draw_no_bet": {
+        "home": 0.721,
+        "away": 0.279
+      },
+      "spreads": {
+        "home_m15": 0.373,
+        "home_m25": 0.192
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 2.0,
+        "goals_scored_avg": 1.4,
+        "goals_conceded_avg": 1.0,
+        "shots_per_game": 14.2,
+        "shots_on_target_per_game": 4.2,
+        "shot_accuracy": 29.6,
+        "corners_per_game": 3.2,
+        "dominance_score": 0.467,
+        "recent_form": "DWWWL",
+        "recent_matches": [
+          {
+            "date": "21/02/26",
+            "opponent": "Vallecano",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "15/02/26",
+            "opponent": "Mallorca",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Ath Madrid",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Valencia",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Alaves",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.6,
+        "goals_scored_avg": 1.2,
+        "goals_conceded_avg": 1.4,
+        "shots_per_game": 9.2,
+        "shots_on_target_per_game": 3.6,
+        "shot_accuracy": 39.1,
+        "corners_per_game": 4.0,
+        "dominance_score": 0.474,
+        "recent_form": "WDDLW",
+        "recent_matches": [
+          {
+            "date": "22/02/26",
+            "opponent": "Getafe",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Alaves",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Girona",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "02/02/26",
+            "opponent": "Mallorca",
+            "score": "1-4",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "24/01/26",
+            "opponent": "Ath Bilbao",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "La Liga",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/90.png",
+      "away_crest": "https://crests.football-data.org/559.png"
+    },
+    {
+      "match_id": "girona_vs_celta_2026-03-01",
+      "home_team": "Girona",
+      "away_team": "Celta",
+      "kickoff": "2026-03-01T20:00:00Z",
+      "model_probs": {
+        "home": 0.348,
+        "draw": 0.322,
+        "away": 0.33
+      },
+      "best_odds": {
+        "home": 2.5,
+        "draw": 3.5,
+        "away": 3.15,
+        "over25": 1.98,
+        "under25": 2.0,
+        "ah_home": 2.14,
+        "ah_away": 1.86
+      },
+      "bookmaker": {
+        "home": "Betfair",
+        "draw": "Betfair",
+        "away": "Betfair",
+        "over25": "Matchbook",
+        "under25": "Matchbook",
+        "ah_home": "Pinnacle",
+        "ah_away": "Matchbook"
+      },
+      "edge": {
+        "home": -5.1,
+        "draw": 3.7,
+        "away": 1.4,
+        "over25": 5.4,
+        "under25": -5.9,
+        "ah_home": -15.8,
+        "ah_away": 15.8
+      },
+      "recommended_bet": "ah_away",
+      "kelly_stake": 5.0,
+      "segment": "Underdog",
+      "quality_score": 0.7,
+      "confidence_badge": "SAFE",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.817,
+        "under_15": 0.183
+      },
+      "over_under": {
+        "over_25": 0.559,
+        "under_25": 0.441
+      },
+      "over_under_35": {
+        "over_35": 0.256,
+        "under_35": 0.744
+      },
+      "btts": {
+        "yes": 0.622,
+        "no": 0.378
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.67,
+        "x2": 0.652,
+        "12": 0.678
+      },
+      "draw_no_bet": {
+        "home": 0.513,
+        "away": 0.487
+      },
+      "spreads": {
+        "home_m15": 0.132,
+        "home_m25": 0.044
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 1.2,
+        "goals_scored_avg": 1.2,
+        "goals_conceded_avg": 1.2,
+        "shots_per_game": 11.8,
+        "shots_on_target_per_game": 5.0,
+        "shot_accuracy": 42.4,
+        "corners_per_game": 4.6,
+        "dominance_score": 0.568,
+        "recent_form": "DWDLD",
+        "recent_matches": [
+          {
+            "date": "23/02/26",
+            "opponent": "Alaves",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "16/02/26",
+            "opponent": "Barcelona",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Sevilla",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "31/01/26",
+            "opponent": "Oviedo",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "26/01/26",
+            "opponent": "Getafe",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.0,
+        "goals_scored_avg": 1.2,
+        "goals_conceded_avg": 1.4,
+        "shots_per_game": 14.8,
+        "shots_on_target_per_game": 4.2,
+        "shot_accuracy": 28.4,
+        "corners_per_game": 5.6,
+        "dominance_score": 0.656,
+        "recent_form": "WDLDL",
+        "recent_matches": [
+          {
+            "date": "22/02/26",
+            "opponent": "Mallorca",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Espanol",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "06/02/26",
+            "opponent": "Osasuna",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Getafe",
+            "score": "0-0",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Sociedad",
+            "score": "1-3",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "La Liga",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/298.png",
+      "away_crest": "https://crests.football-data.org/558.png"
+    },
+    {
+      "match_id": "real_madrid_vs_getafe_2026-03-02",
+      "home_team": "Real Madrid",
+      "away_team": "Getafe",
+      "kickoff": "2026-03-02T20:00:00Z",
+      "model_probs": {
+        "home": 0.915,
+        "draw": 0.0,
+        "away": 0.085
+      },
+      "best_odds": {
+        "home": 1.33,
+        "draw": 5.75,
+        "away": 12.6,
+        "over25": 1.9,
+        "under25": 2.1,
+        "ah_home": 2.02,
+        "ah_away": 1.93
+      },
+      "bookmaker": {
+        "home": "Unibet (UK)",
+        "draw": "Betclic (FR)",
+        "away": "1xBet",
+        "over25": "Coolbet",
+        "under25": "Matchbook",
+        "ah_home": "Pinnacle",
+        "ah_away": "1xBet"
+      },
+      "edge": {
+        "home": 16.7,
+        "draw": -17.3,
+        "away": 0.6,
+        "over25": -15.2,
+        "under25": 15.0,
+        "ah_home": -2.6,
+        "ah_away": 2.6
+      },
+      "recommended_bet": "home",
+      "kelly_stake": 9.9,
+      "segment": "Heavy Favorite",
+      "quality_score": 1.6,
+      "confidence_badge": "ULTRA_SAFE",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.702,
+        "under_15": 0.298
+      },
+      "over_under": {
+        "over_25": 0.374,
+        "under_25": 0.626
+      },
+      "over_under_35": {
+        "over_35": 0.208,
+        "under_35": 0.792
+      },
+      "btts": {
+        "yes": 0.4,
+        "no": 0.6
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.915,
+        "x2": 0.085,
+        "12": 1.0
+      },
+      "draw_no_bet": {
+        "home": 0.915,
+        "away": 0.085
+      },
+      "spreads": {
+        "home_m15": 0.462,
+        "home_m25": 0.241
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 2.4,
+        "goals_scored_avg": 2.2,
+        "goals_conceded_avg": 0.8,
+        "shots_per_game": 13.4,
+        "shots_on_target_per_game": 5.2,
+        "shot_accuracy": 38.8,
+        "corners_per_game": 6.8,
+        "dominance_score": 0.722,
+        "recent_form": "LWWWW",
+        "recent_matches": [
+          {
+            "date": "21/02/26",
+            "opponent": "Osasuna",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Sociedad",
+            "score": "4-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Valencia",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Vallecano",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "24/01/26",
+            "opponent": "Villarreal",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.6,
+        "goals_scored_avg": 1.0,
+        "goals_conceded_avg": 0.6,
+        "shots_per_game": 9.0,
+        "shots_on_target_per_game": 2.8,
+        "shot_accuracy": 31.1,
+        "corners_per_game": 3.4,
+        "dominance_score": 0.519,
+        "recent_form": "LWWDD",
+        "recent_matches": [
+          {
+            "date": "22/02/26",
+            "opponent": "Sevilla",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Villarreal",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Alaves",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Celta",
+            "score": "0-0",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "26/01/26",
+            "opponent": "Girona",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "La Liga",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/86.png",
+      "away_crest": "https://crests.football-data.org/82.png"
+    },
+    {
+      "match_id": "roma_vs_juventus_2026-03-01",
+      "home_team": "Roma",
+      "away_team": "Juventus",
+      "kickoff": "2026-03-01T19:45:00Z",
+      "model_probs": {
+        "home": 0.395,
+        "draw": 0.361,
+        "away": 0.244
+      },
+      "best_odds": {
+        "home": 2.8,
+        "draw": 3.12,
+        "away": 3.05,
+        "over25": 2.41,
+        "under25": 1.69,
+        "ah_home": 2.54,
+        "ah_away": 1.5
+      },
+      "bookmaker": {
+        "home": "Betfair",
+        "draw": "Bet Victor",
+        "away": "Smarkets",
+        "over25": "1xBet",
+        "under25": "Matchbook",
+        "ah_home": "GTbets",
+        "ah_away": "GTbets"
+      },
+      "edge": {
+        "home": 4.0,
+        "draw": 4.2,
+        "away": -8.2,
+        "over25": -6.4,
+        "under25": 5.7,
+        "ah_home": 7.8,
+        "ah_away": -7.8
+      },
+      "recommended_bet": null,
+      "kelly_stake": 0.0,
+      "segment": "Balanced",
+      "quality_score": null,
+      "confidence_badge": "RISKY",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.604,
+        "under_15": 0.396
+      },
+      "over_under": {
+        "over_25": 0.351,
+        "under_25": 0.649
+      },
+      "over_under_35": {
+        "over_35": 0.153,
+        "under_35": 0.847
+      },
+      "btts": {
+        "yes": 0.453,
+        "no": 0.547
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.756,
+        "x2": 0.605,
+        "12": 0.639
+      },
+      "draw_no_bet": {
+        "home": 0.619,
+        "away": 0.381
+      },
+      "spreads": {
+        "home_m15": 0.204,
+        "home_m25": 0.071
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 1.6,
+        "goals_scored_avg": 1.6,
+        "goals_conceded_avg": 0.8,
+        "shots_per_game": 14.4,
+        "shots_on_target_per_game": 4.4,
+        "shot_accuracy": 30.6,
+        "corners_per_game": 5.8,
+        "dominance_score": 0.611,
+        "recent_form": "WDWLD",
+        "recent_matches": [
+          {
+            "date": "22/02/26",
+            "opponent": "Cremonese",
+            "score": "3-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "15/02/26",
+            "opponent": "Napoli",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "09/02/26",
+            "opponent": "Cagliari",
+            "score": "2-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "02/02/26",
+            "opponent": "Udinese",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Milan",
+            "score": "1-1",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.4,
+        "goals_scored_avg": 2.2,
+        "goals_conceded_avg": 1.6,
+        "shots_per_game": 16.6,
+        "shots_on_target_per_game": 6.6,
+        "shot_accuracy": 39.8,
+        "corners_per_game": 4.2,
+        "dominance_score": 0.647,
+        "recent_form": "LLDWW",
+        "recent_matches": [
+          {
+            "date": "21/02/26",
+            "opponent": "Como",
+            "score": "0-2",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Inter",
+            "score": "2-3",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Lazio",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "01/02/26",
+            "opponent": "Parma",
+            "score": "4-1",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Napoli",
+            "score": "3-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          }
+        ]
+      },
+      "league": "Serie A",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/100.png",
+      "away_crest": "https://crests.football-data.org/109.png"
+    },
+    {
+      "match_id": "pisa_vs_bologna_2026-03-02",
+      "home_team": "Pisa",
+      "away_team": "Bologna",
+      "kickoff": "2026-03-02T17:30:00Z",
+      "model_probs": {
+        "home": 0.198,
+        "draw": 0.432,
+        "away": 0.37
+      },
+      "best_odds": {
+        "home": 4.5,
+        "draw": 3.51,
+        "away": 2.02,
+        "over25": 2.24,
+        "under25": 1.78
+      },
+      "bookmaker": {
+        "home": "Betfair",
+        "draw": "1xBet",
+        "away": "1xBet",
+        "over25": "Coolbet",
+        "under25": "1xBet"
+      },
+      "edge": {
+        "home": -2.4,
+        "draw": 14.8,
+        "away": -12.4,
+        "over25": 1.4,
+        "under25": -2.3
+      },
+      "recommended_bet": "draw",
+      "kelly_stake": 3.1,
+      "segment": "Balanced",
+      "quality_score": 0.3,
+      "confidence_badge": "RISKY",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.755,
+        "under_15": 0.245
+      },
+      "over_under": {
+        "over_25": 0.461,
+        "under_25": 0.539
+      },
+      "over_under_35": {
+        "over_35": 0.252,
+        "under_35": 0.748
+      },
+      "btts": {
+        "yes": 0.547,
+        "no": 0.453
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.63,
+        "x2": 0.802,
+        "12": 0.568
+      },
+      "draw_no_bet": {
+        "home": 0.349,
+        "away": 0.651
+      },
+      "spreads": {
+        "home_m15": 0.05,
+        "home_m25": 0.011
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 0.2,
+        "goals_scored_avg": 0.8,
+        "goals_conceded_avg": 2.4,
+        "shots_per_game": 9.6,
+        "shots_on_target_per_game": 3.0,
+        "shot_accuracy": 31.2,
+        "corners_per_game": 3.4,
+        "dominance_score": 0.366,
+        "recent_form": "LLDLL",
+        "recent_matches": [
+          {
+            "date": "23/02/26",
+            "opponent": "Fiorentina",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "13/02/26",
+            "opponent": "Milan",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "06/02/26",
+            "opponent": "Verona",
+            "score": "0-0",
+            "result": "draw",
+            "home_away": "away",
+            "clean_sheet": true
+          },
+          {
+            "date": "31/01/26",
+            "opponent": "Sassuolo",
+            "score": "1-3",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "23/01/26",
+            "opponent": "Inter",
+            "score": "2-6",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.2,
+        "goals_scored_avg": 1.0,
+        "goals_conceded_avg": 1.6,
+        "shots_per_game": 13.4,
+        "shots_on_target_per_game": 3.8,
+        "shot_accuracy": 28.4,
+        "corners_per_game": 3.4,
+        "dominance_score": 0.559,
+        "recent_form": "WWLLL",
+        "recent_matches": [
+          {
+            "date": "23/02/26",
+            "opponent": "Udinese",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "15/02/26",
+            "opponent": "Torino",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Parma",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "03/02/26",
+            "opponent": "Milan",
+            "score": "0-3",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "25/01/26",
+            "opponent": "Genoa",
+            "score": "2-3",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "Serie A",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/487.png",
+      "away_crest": "https://crests.football-data.org/103.png"
+    },
+    {
+      "match_id": "udinese_vs_fiorentina_2026-03-02",
+      "home_team": "Udinese",
+      "away_team": "Fiorentina",
+      "kickoff": "2026-03-02T19:45:00Z",
+      "model_probs": {
+        "home": 0.242,
+        "draw": 0.417,
+        "away": 0.341
+      },
+      "best_odds": {
+        "home": 3.25,
+        "draw": 3.45,
+        "away": 2.5,
+        "over25": 2.1,
+        "under25": 1.88
+      },
+      "bookmaker": {
+        "home": "Smarkets",
+        "draw": "Unibet (NL)",
+        "away": "Betfair",
+        "over25": "Matchbook",
+        "under25": "Matchbook"
+      },
+      "edge": {
+        "home": -6.6,
+        "draw": 12.6,
+        "away": -6.0,
+        "over25": -1.5,
+        "under25": 0.7
+      },
+      "recommended_bet": "draw",
+      "kelly_stake": 2.7,
+      "segment": "Balanced",
+      "quality_score": 0.2,
+      "confidence_badge": "RISKY",
+      "is_european": false,
+      "prediction_source": "full_pipeline",
+      "over_under_15": {
+        "over_15": 0.755,
+        "under_15": 0.245
+      },
+      "over_under": {
+        "over_25": 0.461,
+        "under_25": 0.539
+      },
+      "over_under_35": {
+        "over_35": 0.252,
+        "under_35": 0.748
+      },
+      "btts": {
+        "yes": 0.547,
+        "no": 0.453
+      },
+      "correct_score": null,
+      "double_chance": {
+        "1x": 0.659,
+        "x2": 0.758,
+        "12": 0.583
+      },
+      "draw_no_bet": {
+        "home": 0.415,
+        "away": 0.585
+      },
+      "spreads": {
+        "home_m15": 0.124,
+        "home_m25": 0.039
+      },
+      "bandit_recommendation": null,
+      "home_stats": {
+        "ppg": 1.2,
+        "goals_scored_avg": 1.2,
+        "goals_conceded_avg": 1.2,
+        "shots_per_game": 10.4,
+        "shots_on_target_per_game": 3.4,
+        "shot_accuracy": 32.7,
+        "corners_per_game": 5.2,
+        "dominance_score": 0.447,
+        "recent_form": "LLLWW",
+        "recent_matches": [
+          {
+            "date": "23/02/26",
+            "opponent": "Bologna",
+            "score": "0-1",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "15/02/26",
+            "opponent": "Sassuolo",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "08/02/26",
+            "opponent": "Lecce",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "02/02/26",
+            "opponent": "Roma",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "26/01/26",
+            "opponent": "Verona",
+            "score": "3-1",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "away_stats": {
+        "ppg": 1.4,
+        "goals_scored_avg": 1.4,
+        "goals_conceded_avg": 1.4,
+        "shots_per_game": 14.6,
+        "shots_on_target_per_game": 4.2,
+        "shot_accuracy": 28.8,
+        "corners_per_game": 5.4,
+        "dominance_score": 0.512,
+        "recent_form": "WWDLL",
+        "recent_matches": [
+          {
+            "date": "23/02/26",
+            "opponent": "Pisa",
+            "score": "1-0",
+            "result": "win",
+            "home_away": "home",
+            "clean_sheet": true
+          },
+          {
+            "date": "14/02/26",
+            "opponent": "Como",
+            "score": "2-1",
+            "result": "win",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "07/02/26",
+            "opponent": "Torino",
+            "score": "2-2",
+            "result": "draw",
+            "home_away": "home",
+            "clean_sheet": false
+          },
+          {
+            "date": "31/01/26",
+            "opponent": "Napoli",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "away",
+            "clean_sheet": false
+          },
+          {
+            "date": "24/01/26",
+            "opponent": "Cagliari",
+            "score": "1-2",
+            "result": "loss",
+            "home_away": "home",
+            "clean_sheet": false
+          }
+        ]
+      },
+      "league": "Serie A",
+      "league_slug": "",
+      "home_crest": "https://crests.football-data.org/115.png",
+      "away_crest": "https://crests.football-data.org/99.png"
+    }
+  ],
+  "combos": [
+    {
+      "type": "cross_match",
+      "combo_id": "cross_2leg_rea_bet",
+      "label": "REA-GET: Real Madrid + BET-SEV: O2.5",
+      "matches": [
+        {
+          "home_team": "Real Madrid",
+          "away_team": "Getafe",
+          "league": "La Liga",
+          "market": "home",
+          "prob": 0.915,
+          "odds": 1.33
+        },
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga",
+          "market": "over25",
+          "prob": 0.7,
+          "odds": 2.04
+        }
+      ],
+      "n_legs": 2,
+      "prob": 0.6405,
+      "combined_odds": 2.71,
+      "edge": 27.2,
+      "kelly_stake": 4.3,
+      "confidence": "SAFE"
+    },
+    {
+      "type": "cross_match",
+      "combo_id": "cross_2leg_rea_mar",
+      "label": "REA-GET: Real Madrid + MAR-LYO: O2.5",
+      "matches": [
+        {
+          "home_team": "Real Madrid",
+          "away_team": "Getafe",
+          "league": "La Liga",
+          "market": "home",
+          "prob": 0.915,
+          "odds": 1.33
+        },
+        {
+          "home_team": "Marseille",
+          "away_team": "Lyon",
+          "league": "Ligue 1",
+          "market": "over25",
+          "prob": 0.705,
+          "odds": 1.88
+        }
+      ],
+      "n_legs": 2,
+      "prob": 0.6451,
+      "combined_odds": 2.5,
+      "edge": 24.5,
+      "kelly_stake": 4.1,
+      "confidence": "SAFE"
+    },
+    {
+      "type": "cross_match",
+      "combo_id": "cross_3leg_rea_bet_mar",
+      "label": "REA-GET: Real Madrid + BET-SEV: O2.5 + MAR-LYO: O2.5",
+      "matches": [
+        {
+          "home_team": "Real Madrid",
+          "away_team": "Getafe",
+          "league": "La Liga",
+          "market": "home",
+          "prob": 0.915,
+          "odds": 1.33
+        },
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga",
+          "market": "over25",
+          "prob": 0.7,
+          "odds": 2.04
+        },
+        {
+          "home_team": "Marseille",
+          "away_team": "Lyon",
+          "league": "Ligue 1",
+          "market": "over25",
+          "prob": 0.705,
+          "odds": 1.88
+        }
+      ],
+      "n_legs": 3,
+      "prob": 0.4516,
+      "combined_odds": 5.1,
+      "edge": 25.6,
+      "kelly_stake": 1.6,
+      "confidence": "RISKY"
+    },
+    {
+      "type": "cross_match",
+      "combo_id": "cross_2leg_bet_mar",
+      "label": "BET-SEV: O2.5 + MAR-LYO: O2.5",
+      "matches": [
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga",
+          "market": "over25",
+          "prob": 0.7,
+          "odds": 2.04
+        },
+        {
+          "home_team": "Marseille",
+          "away_team": "Lyon",
+          "league": "Ligue 1",
+          "market": "over25",
+          "prob": 0.705,
+          "odds": 1.88
+        }
+      ],
+      "n_legs": 2,
+      "prob": 0.4935,
+      "combined_odds": 3.84,
+      "edge": 23.3,
+      "kelly_stake": 1.6,
+      "confidence": "RISKY"
+    },
+    {
+      "type": "cross_match",
+      "combo_id": "cross_2leg_bet_pis",
+      "label": "BET-SEV: O2.5 + PIS-BOL: Nul",
+      "matches": [
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga",
+          "market": "over25",
+          "prob": 0.7,
+          "odds": 2.04
+        },
+        {
+          "home_team": "Pisa",
+          "away_team": "Bologna",
+          "league": "Serie A",
+          "market": "draw",
+          "prob": 0.432,
+          "odds": 3.51
+        }
+      ],
+      "n_legs": 2,
+      "prob": 0.3024,
+      "combined_odds": 7.16,
+      "edge": 16.3,
+      "kelly_stake": 0.6,
+      "confidence": "ULTRA_RISKY"
+    },
+    {
+      "type": "cross_match",
+      "combo_id": "cross_3leg_rea_bet_pis",
+      "label": "REA-GET: Real Madrid + BET-SEV: O2.5 + PIS-BOL: Nul",
+      "matches": [
+        {
+          "home_team": "Real Madrid",
+          "away_team": "Getafe",
+          "league": "La Liga",
+          "market": "home",
+          "prob": 0.915,
+          "odds": 1.33
+        },
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga",
+          "market": "over25",
+          "prob": 0.7,
+          "odds": 2.04
+        },
+        {
+          "home_team": "Pisa",
+          "away_team": "Bologna",
+          "league": "Serie A",
+          "market": "draw",
+          "prob": 0.432,
+          "odds": 3.51
+        }
+      ],
+      "n_legs": 3,
+      "prob": 0.2767,
+      "combined_odds": 9.52,
+      "edge": 17.2,
+      "kelly_stake": 0.6,
+      "confidence": "ULTRA_RISKY"
+    },
+    {
+      "type": "same_match",
+      "combo_id": "away_over25",
+      "label": "Bologna + Over 2.5",
+      "matches": [
+        {
+          "home_team": "Pisa",
+          "away_team": "Bologna",
+          "league": "Serie A"
+        }
+      ],
+      "prob": 0.355,
+      "combined_odds": 4.52,
+      "edge": 13.4,
+      "kelly_stake": 2.6,
+      "confidence": "RISKY"
+    },
+    {
+      "type": "same_match",
+      "combo_id": "away_over25",
+      "label": "Celta + Over 2.5",
+      "matches": [
+        {
+          "home_team": "Girona",
+          "away_team": "Celta",
+          "league": "La Liga"
+        }
+      ],
+      "prob": 0.268,
+      "combined_odds": 6.24,
+      "edge": 10.7,
+      "kelly_stake": 1.9,
+      "confidence": "ULTRA_RISKY"
+    },
+    {
+      "type": "same_match",
+      "combo_id": "away_over25",
+      "label": "Lyon + Over 2.5",
+      "matches": [
+        {
+          "home_team": "Marseille",
+          "away_team": "Lyon",
+          "league": "Ligue 1"
+        }
+      ],
+      "prob": 0.22,
+      "combined_odds": 7.52,
+      "edge": 8.7,
+      "kelly_stake": 1.5,
+      "confidence": "ULTRA_RISKY"
+    },
+    {
+      "type": "same_match",
+      "combo_id": "away_over25",
+      "label": "Fiorentina + Over 2.5",
+      "matches": [
+        {
+          "home_team": "Udinese",
+          "away_team": "Fiorentina",
+          "league": "Serie A"
+        }
+      ],
+      "prob": 0.259,
+      "combined_odds": 5.25,
+      "edge": 6.9,
+      "kelly_stake": 1.3,
+      "confidence": "ULTRA_RISKY"
+    },
+    {
+      "type": "same_match",
+      "combo_id": "away_over25",
+      "label": "Sevilla + Over 2.5",
+      "matches": [
+        {
+          "home_team": "Betis",
+          "away_team": "Sevilla",
+          "league": "La Liga"
+        }
+      ],
+      "prob": 0.129,
+      "combined_odds": 10.49,
+      "edge": 3.4,
+      "kelly_stake": 0.6,
+      "confidence": "ULTRA_RISKY"
+    }
+  ],
+  "generated_at": "2026-03-01T18:19:51.537490"
+}

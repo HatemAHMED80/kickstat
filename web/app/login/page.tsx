@@ -1,133 +1,88 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { getSupabase } from '../lib/supabase';
+import { useAuth } from '../contexts/auth-context';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { session, loading: authLoading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && session) {
+      router.push('/dashboard');
+    }
+  }, [authLoading, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setError(null);
 
-    // Simple authentication (replace with real auth later)
-    // For now, hardcoded credentials
-    if (email === 'admin@kickstat.com' && password === 'kickstat2026') {
-      // Store auth token in localStorage
-      localStorage.setItem('kickstat_auth', 'true');
-      localStorage.setItem('kickstat_user', email);
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      // Redirect to dashboard
+      if (error) { setError(error.message); return; }
       router.push('/dashboard');
-    } else {
-      setError('Email ou mot de passe incorrect');
+    } catch (err) {
+      setError('Une erreur est survenue');
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-2xl mb-4">
-            <span className="text-white text-2xl font-bold">K</span>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Kickstat
-          </h1>
-          <p className="text-gray-600">
-            Prédictions de paris sportifs IA
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
+      <div className="w-full max-w-[400px]">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <span className="text-xl font-bold tracking-tight text-white">
+            Kick<span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">stat</span>
+          </span>
+        </Link>
 
-        {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Connexion
-          </h2>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
+        <div className="bg-white/5 border border-white/10 rounded-xl p-8">
+          <h1 className="text-2xl font-bold text-white text-center mb-2">Se connecter</h1>
+          <p className="text-gray-400 text-center text-sm mb-6">Accédez à vos prédictions</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-red-400 text-sm">{error}</div>
+            )}
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="admin@kickstat.com"
-                required
-              />
+              <label htmlFor="email" className="block text-gray-400 text-sm mb-1.5">Email</label>
+              <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:border-violet-500 focus:outline-none"
+                placeholder="vous@exemple.com" required />
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Mot de passe
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="••••••••"
-                required
-              />
+              <label htmlFor="password" className="block text-gray-400 text-sm mb-1.5">Mot de passe</label>
+              <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:border-violet-500 focus:outline-none"
+                placeholder="Votre mot de passe" required />
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <input
-                id="remember"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
-                Se souvenir de moi
-              </label>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button type="submit" disabled={loading}
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 text-white font-semibold hover:from-violet-500 hover:to-violet-400 transition disabled:opacity-50">
               {loading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-sm font-medium text-gray-700 mb-2">
-              Identifiants de test:
-            </p>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p><span className="font-medium">Email:</span> admin@kickstat.com</p>
-              <p><span className="font-medium">Mot de passe:</span> kickstat2026</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Kickstat © 2026 - Prédictions IA Dixon-Coles + ELO</p>
+          <p className="text-center text-gray-500 text-sm mt-6">
+            Pas encore de compte ? <Link href="/signup" className="text-violet-400 hover:underline">Créer un compte</Link>
+          </p>
         </div>
       </div>
     </div>

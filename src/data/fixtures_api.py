@@ -42,6 +42,8 @@ TEAM_NAME_MAPPING = {
     "Angers SCO": "Angers",
     "AS Saint-Étienne": "St Etienne",
     "Paris FC": "Paris FC",
+    "FC Lorient": "Lorient",
+    "FC Metz": "Metz",
 
     # Premier League
     "Manchester City FC": "Man City",
@@ -65,6 +67,70 @@ TEAM_NAME_MAPPING = {
     "Ipswich Town FC": "Ipswich",
     "Southampton FC": "Southampton",
     "Leeds United FC": "Leeds",
+
+    # Serie A
+    "AC Milan": "Milan",
+    "AC Pisa 1909": "Pisa",
+    "ACF Fiorentina": "Fiorentina",
+    "AS Roma": "Roma",
+    "Atalanta BC": "Atalanta",
+    "Bologna FC 1909": "Bologna",
+    "Cagliari Calcio": "Cagliari",
+    "Como 1907": "Como",
+    "FC Internazionale Milano": "Inter",
+    "Genoa CFC": "Genoa",
+    "Hellas Verona FC": "Verona",
+    "Juventus FC": "Juventus",
+    "Parma Calcio 1913": "Parma",
+    "SS Lazio": "Lazio",
+    "SSC Napoli": "Napoli",
+    "Torino FC": "Torino",
+    "US Cremonese": "Cremonese",
+    "US Lecce": "Lecce",
+    "US Sassuolo Calcio": "Sassuolo",
+    "Udinese Calcio": "Udinese",
+
+    # La Liga
+    "Athletic Club": "Ath Bilbao",
+    "CA Osasuna": "Osasuna",
+    "Club Atlético de Madrid": "Ath Madrid",
+    "Deportivo Alavés": "Alaves",
+    "Elche CF": "Elche",
+    "FC Barcelona": "Barcelona",
+    "Getafe CF": "Getafe",
+    "Girona FC": "Girona",
+    "Levante UD": "Levante",
+    "RC Celta de Vigo": "Celta",
+    "RCD Espanyol de Barcelona": "Espanol",
+    "RCD Mallorca": "Mallorca",
+    "Rayo Vallecano de Madrid": "Vallecano",
+    "Real Betis Balompié": "Betis",
+    "Real Madrid CF": "Real Madrid",
+    "Real Oviedo": "Oviedo",
+    "Real Sociedad de Fútbol": "Sociedad",
+    "Sevilla FC": "Sevilla",
+    "Valencia CF": "Valencia",
+    "Villarreal CF": "Villarreal",
+
+    # Bundesliga
+    "1. FC Heidenheim 1846": "Heidenheim",
+    "1. FC Köln": "FC Koln",
+    "1. FC Union Berlin": "Union Berlin",
+    "1. FSV Mainz 05": "Mainz",
+    "Bayer 04 Leverkusen": "Leverkusen",
+    "Borussia Dortmund": "Dortmund",
+    "Borussia Mönchengladbach": "M'gladbach",
+    "Eintracht Frankfurt": "Ein Frankfurt",
+    "FC Augsburg": "Augsburg",
+    "FC Bayern München": "Bayern Munich",
+    "FC St. Pauli 1910": "St Pauli",
+    "Hamburger SV": "Hamburg",
+    "RB Leipzig": "RB Leipzig",
+    "SC Freiburg": "Freiburg",
+    "SV Werder Bremen": "Werder Bremen",
+    "TSG 1899 Hoffenheim": "Hoffenheim",
+    "VfB Stuttgart": "Stuttgart",
+    "VfL Wolfsburg": "Wolfsburg",
 }
 
 
@@ -177,6 +243,8 @@ def fetch_fixtures(
                     fixture = {
                         "home": home_team,
                         "away": away_team,
+                        "home_crest": match["homeTeam"].get("crest", ""),
+                        "away_crest": match["awayTeam"].get("crest", ""),
                         "league": league_name,
                         "kickoff": match["utcDate"],  # ISO format
                         "fixture_id": match["id"],
@@ -222,6 +290,19 @@ def fetch_tomorrow_fixtures(leagues: Optional[List[str]] = None) -> List[Dict]:
     """
     tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     return fetch_fixtures(date_from=tomorrow, date_to=tomorrow, leagues=leagues)
+
+
+def fetch_date_fixtures(date: str, leagues: Optional[List[str]] = None) -> List[Dict]:
+    """Fetch fixtures for a specific date.
+
+    Args:
+        date: Date in YYYY-MM-DD format.
+        leagues: List of league slugs. Defaults to Ligue 1 + Premier League.
+
+    Returns:
+        List of fixture dicts.
+    """
+    return fetch_fixtures(date_from=date, date_to=date, leagues=leagues)
 
 
 def fetch_week_fixtures(leagues: Optional[List[str]] = None) -> List[Dict]:

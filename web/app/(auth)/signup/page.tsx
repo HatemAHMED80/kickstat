@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getSupabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/auth-context';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,14 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { session, loading: authLoading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && session) {
+      router.push('/dashboard');
+    }
+  }, [authLoading, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +46,9 @@ export default function SignupPage() {
       });
 
       if (error) { setError(error.message); return; }
-      setSuccess(true);
+      // TODO: réactiver quand le SMTP sera configuré
+      // setSuccess(true);
+      router.push('/dashboard');
     } catch (err) {
       setError('Une erreur est survenue');
     } finally {
@@ -61,22 +72,23 @@ export default function SignupPage() {
     }
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
-        <div className="w-full max-w-[400px] bg-white/5 border border-white/10 rounded-xl p-8 text-center">
-          <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-emerald-400 text-3xl">✓</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Vérifiez votre email</h1>
-          <p className="text-gray-400 mb-6">
-            Nous avons envoyé un lien de confirmation à <span className="text-white font-medium">{email}</span>
-          </p>
-          <p className="text-gray-500 text-sm">Cliquez sur le lien dans l&apos;email pour activer votre compte.</p>
-        </div>
-      </div>
-    );
-  }
+  // TODO: réactiver quand le SMTP sera configuré
+  // if (success) {
+  //   return (
+  //     <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
+  //       <div className="w-full max-w-[400px] bg-white/5 border border-white/10 rounded-xl p-8 text-center">
+  //         <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+  //           <span className="text-emerald-400 text-3xl">✓</span>
+  //         </div>
+  //         <h1 className="text-2xl font-bold text-white mb-2">Vérifiez votre email</h1>
+  //         <p className="text-gray-400 mb-6">
+  //           Nous avons envoyé un lien de confirmation à <span className="text-white font-medium">{email}</span>
+  //         </p>
+  //         <p className="text-gray-500 text-sm">Cliquez sur le lien dans l&apos;email pour activer votre compte.</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">

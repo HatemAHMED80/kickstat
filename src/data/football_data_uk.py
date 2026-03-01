@@ -338,12 +338,24 @@ def build_multi_market_odds(matches: list[dict]) -> dict:
                 "best_under": m.get("max_corner_under", pcu),
             }
 
+        # Asian Handicap (goals)
+        ah_line = m.get("ah_line", 0)
+        pahh = m.get("pinnacle_ahh", 0)
+        paha = m.get("pinnacle_aha", 0)
+        if pahh > 1.0 and paha > 1.0 and ah_line != 0:
+            entry["ah"] = {
+                "line": ah_line,
+                "pin_home": pahh, "pin_away": paha,
+                "best_home": m.get("max_ahh", pahh),
+                "best_away": m.get("max_aha", paha),
+            }
+
         if entry:
             odds_data[key] = entry
 
     # Count market coverage
     n = len(odds_data)
-    for mkt in ["1x2", "ou25", "corner_1x2", "corner_ou"]:
+    for mkt in ["1x2", "ou25", "corner_1x2", "corner_ou", "ah"]:
         count = sum(1 for v in odds_data.values() if mkt in v)
         logger.info(f"  {mkt}: {count}/{n} matches with odds")
 

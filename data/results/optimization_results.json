@@ -1,0 +1,519 @@
+{
+  "premier_league": {
+    "over25": {
+      "best": {
+        "strategy": "xgb",
+        "edge_threshold": 16.0,
+        "min_prob": 0.5,
+        "n_bets": 251,
+        "wins": 129,
+        "win_rate": 0.5139,
+        "total_pnl": 14.48,
+        "roi": 0.0577,
+        "avg_edge": 25.8,
+        "avg_odds": 2.07
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 20.0,
+        "min_prob": 0.55,
+        "n_bets": 205,
+        "wins": 117,
+        "win_rate": 0.5707,
+        "total_pnl": 13.78,
+        "roi": 0.0672,
+        "avg_edge": 30.5,
+        "avg_odds": 1.87
+      },
+      "total_combos": 720
+    },
+    "under25": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 10.0,
+        "min_prob": 0.55,
+        "n_bets": 225,
+        "wins": 126,
+        "win_rate": 0.56,
+        "total_pnl": 20.82,
+        "roi": 0.0925,
+        "avg_edge": 26.9,
+        "avg_odds": 1.97
+      },
+      "safe": {
+        "strategy": "xgb",
+        "edge_threshold": 3.0,
+        "min_prob": 0.65,
+        "n_bets": 33,
+        "wins": 22,
+        "win_rate": 0.6667,
+        "total_pnl": 6.68,
+        "roi": 0.2024,
+        "avg_edge": 31.2,
+        "avg_odds": 1.8
+      },
+      "total_combos": 720
+    },
+    "ah_home": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 18.0,
+        "min_prob": 0.25,
+        "n_bets": 183,
+        "wins": 99,
+        "win_rate": 0.541,
+        "total_pnl": 11.72,
+        "roi": 0.064,
+        "avg_edge": 32.5,
+        "avg_odds": 1.98
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 18.0,
+        "min_prob": 0.25,
+        "n_bets": 183,
+        "wins": 99,
+        "win_rate": 0.541,
+        "total_pnl": 11.72,
+        "roi": 0.064,
+        "avg_edge": 32.5,
+        "avg_odds": 1.98
+      },
+      "total_combos": 720
+    },
+    "ah_away": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 8.0,
+        "min_prob": 0.25,
+        "n_bets": 737,
+        "wins": 355,
+        "win_rate": 0.4817,
+        "total_pnl": 3.23,
+        "roi": 0.0044,
+        "avg_edge": 27.6,
+        "avg_odds": 2.09
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 8.0,
+        "min_prob": 0.25,
+        "n_bets": 737,
+        "wins": 355,
+        "win_rate": 0.4817,
+        "total_pnl": 3.23,
+        "roi": 0.0044,
+        "avg_edge": 27.6,
+        "avg_odds": 2.09
+      },
+      "total_combos": 720
+    }
+  },
+  "la_liga": {
+    "over25": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 7.0,
+        "min_prob": 0.65,
+        "n_bets": 167,
+        "wins": 105,
+        "win_rate": 0.6287,
+        "total_pnl": 18.5,
+        "roi": 0.1108,
+        "avg_edge": 33.7,
+        "avg_odds": 1.81
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 18.0,
+        "min_prob": 0.7,
+        "n_bets": 73,
+        "wins": 48,
+        "win_rate": 0.6575,
+        "total_pnl": 12.96,
+        "roi": 0.1775,
+        "avg_edge": 45.1,
+        "avg_odds": 1.83
+      },
+      "total_combos": 720
+    },
+    "under25": {
+      "best": {
+        "strategy": "xgb",
+        "edge_threshold": 20.0,
+        "min_prob": 0.5,
+        "n_bets": 161,
+        "wins": 74,
+        "win_rate": 0.4596,
+        "total_pnl": 16.11,
+        "roi": 0.1001,
+        "avg_edge": 36.2,
+        "avg_odds": 2.41
+      },
+      "safe": {
+        "strategy": "xgb",
+        "edge_threshold": 20.0,
+        "min_prob": 0.5,
+        "n_bets": 161,
+        "wins": 74,
+        "win_rate": 0.4596,
+        "total_pnl": 16.11,
+        "roi": 0.1001,
+        "avg_edge": 36.2,
+        "avg_odds": 2.41
+      },
+      "total_combos": 720
+    },
+    "ah_home": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 20.0,
+        "min_prob": 0.6,
+        "n_bets": 123,
+        "wins": 70,
+        "win_rate": 0.5691,
+        "total_pnl": 14.14,
+        "roi": 0.115,
+        "avg_edge": 32.9,
+        "avg_odds": 1.95
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.7,
+        "n_bets": 33,
+        "wins": 21,
+        "win_rate": 0.6364,
+        "total_pnl": 7.39,
+        "roi": 0.2239,
+        "avg_edge": 47.1,
+        "avg_odds": 1.93
+      },
+      "total_combos": 720
+    },
+    "ah_away": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.7,
+        "n_bets": 115,
+        "wins": 50,
+        "win_rate": 0.4348,
+        "total_pnl": -18.69,
+        "roi": -0.1625,
+        "avg_edge": 47.8,
+        "avg_odds": 1.94
+      },
+      "safe": null,
+      "total_combos": 720
+    }
+  },
+  "bundesliga": {
+    "over25": {
+      "best": {
+        "strategy": "xgb",
+        "edge_threshold": 18.0,
+        "min_prob": 0.65,
+        "n_bets": 87,
+        "wins": 52,
+        "win_rate": 0.5977,
+        "total_pnl": -1.01,
+        "roi": -0.0116,
+        "avg_edge": 27.9,
+        "avg_odds": 1.68
+      },
+      "safe": null,
+      "total_combos": 720
+    },
+    "under25": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.6,
+        "n_bets": 64,
+        "wins": 43,
+        "win_rate": 0.6719,
+        "total_pnl": 19.01,
+        "roi": 0.297,
+        "avg_edge": 31.7,
+        "avg_odds": 1.94
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.65,
+        "n_bets": 36,
+        "wins": 25,
+        "win_rate": 0.6944,
+        "total_pnl": 11.8,
+        "roi": 0.3278,
+        "avg_edge": 36.9,
+        "avg_odds": 1.92
+      },
+      "total_combos": 612
+    },
+    "ah_home": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.7,
+        "n_bets": 27,
+        "wins": 15,
+        "win_rate": 0.5556,
+        "total_pnl": 3.08,
+        "roi": 0.1141,
+        "avg_edge": 51.9,
+        "avg_odds": 1.98
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.65,
+        "n_bets": 57,
+        "wins": 30,
+        "win_rate": 0.5263,
+        "total_pnl": 2.23,
+        "roi": 0.0391,
+        "avg_edge": 41.7,
+        "avg_odds": 1.96
+      },
+      "total_combos": 720
+    },
+    "ah_away": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.7,
+        "n_bets": 74,
+        "wins": 27,
+        "win_rate": 0.3649,
+        "total_pnl": -21.44,
+        "roi": -0.2897,
+        "avg_edge": 47.7,
+        "avg_odds": 1.95
+      },
+      "safe": null,
+      "total_combos": 720
+    }
+  },
+  "serie_a": {
+    "over25": {
+      "best": {
+        "strategy": "xgb",
+        "edge_threshold": 16.0,
+        "min_prob": 0.55,
+        "n_bets": 99,
+        "wins": 56,
+        "win_rate": 0.5657,
+        "total_pnl": 3.37,
+        "roi": 0.034,
+        "avg_edge": 28.4,
+        "avg_odds": 1.84
+      },
+      "safe": {
+        "strategy": "xgb",
+        "edge_threshold": 16.0,
+        "min_prob": 0.6,
+        "n_bets": 82,
+        "wins": 48,
+        "win_rate": 0.5854,
+        "total_pnl": 3.3,
+        "roi": 0.0402,
+        "avg_edge": 29.7,
+        "avg_odds": 1.78
+      },
+      "total_combos": 720
+    },
+    "under25": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 13.0,
+        "min_prob": 0.25,
+        "n_bets": 296,
+        "wins": 169,
+        "win_rate": 0.5709,
+        "total_pnl": 38.07,
+        "roi": 0.1286,
+        "avg_edge": 22.7,
+        "avg_odds": 2.0
+      },
+      "safe": {
+        "strategy": "xgb",
+        "edge_threshold": 20.0,
+        "min_prob": 0.5,
+        "n_bets": 95,
+        "wins": 51,
+        "win_rate": 0.5368,
+        "total_pnl": 23.53,
+        "roi": 0.2477,
+        "avg_edge": 32.7,
+        "avg_odds": 2.31
+      },
+      "total_combos": 684
+    },
+    "ah_home": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.65,
+        "n_bets": 44,
+        "wins": 24,
+        "win_rate": 0.5455,
+        "total_pnl": 3.07,
+        "roi": 0.0698,
+        "avg_edge": 40.1,
+        "avg_odds": 1.96
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.65,
+        "n_bets": 44,
+        "wins": 24,
+        "win_rate": 0.5455,
+        "total_pnl": 3.07,
+        "roi": 0.0698,
+        "avg_edge": 40.1,
+        "avg_odds": 1.96
+      },
+      "total_combos": 720
+    },
+    "ah_away": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 7.0,
+        "min_prob": 0.25,
+        "n_bets": 736,
+        "wins": 382,
+        "win_rate": 0.519,
+        "total_pnl": 36.48,
+        "roi": 0.0496,
+        "avg_edge": 25.5,
+        "avg_odds": 2.03
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 3.0,
+        "min_prob": 0.7,
+        "n_bets": 111,
+        "wins": 51,
+        "win_rate": 0.4595,
+        "total_pnl": 7.44,
+        "roi": 0.067,
+        "avg_edge": 47.3,
+        "avg_odds": 2.12
+      },
+      "total_combos": 720
+    }
+  },
+  "ligue_1": {
+    "over25": {
+      "best": {
+        "strategy": "xgb",
+        "edge_threshold": 19.0,
+        "min_prob": 0.6,
+        "n_bets": 48,
+        "wins": 27,
+        "win_rate": 0.5625,
+        "total_pnl": 3.1,
+        "roi": 0.0646,
+        "avg_edge": 39.4,
+        "avg_odds": 1.93
+      },
+      "safe": {
+        "strategy": "xgb",
+        "edge_threshold": 19.0,
+        "min_prob": 0.65,
+        "n_bets": 38,
+        "wins": 22,
+        "win_rate": 0.5789,
+        "total_pnl": 2.62,
+        "roi": 0.0689,
+        "avg_edge": 41.6,
+        "avg_odds": 1.89
+      },
+      "total_combos": 720
+    },
+    "under25": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 17.0,
+        "min_prob": 0.35,
+        "n_bets": 268,
+        "wins": 128,
+        "win_rate": 0.4776,
+        "total_pnl": 3.88,
+        "roi": 0.0145,
+        "avg_edge": 28.8,
+        "avg_odds": 2.15
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 19.0,
+        "min_prob": 0.7,
+        "n_bets": 31,
+        "wins": 18,
+        "win_rate": 0.5806,
+        "total_pnl": 1.66,
+        "roi": 0.0535,
+        "avg_edge": 35.2,
+        "avg_odds": 1.82
+      },
+      "total_combos": 644
+    },
+    "ah_home": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 11.0,
+        "min_prob": 0.25,
+        "n_bets": 248,
+        "wins": 131,
+        "win_rate": 0.5282,
+        "total_pnl": 11.09,
+        "roi": 0.0447,
+        "avg_edge": 23.1,
+        "avg_odds": 1.98
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 11.0,
+        "min_prob": 0.25,
+        "n_bets": 248,
+        "wins": 131,
+        "win_rate": 0.5282,
+        "total_pnl": 11.09,
+        "roi": 0.0447,
+        "avg_edge": 23.1,
+        "avg_odds": 1.98
+      },
+      "total_combos": 720
+    },
+    "ah_away": {
+      "best": {
+        "strategy": "baseline",
+        "edge_threshold": 9.0,
+        "min_prob": 0.55,
+        "n_bets": 545,
+        "wins": 282,
+        "win_rate": 0.5174,
+        "total_pnl": 29.18,
+        "roi": 0.0535,
+        "avg_edge": 28.7,
+        "avg_odds": 2.12
+      },
+      "safe": {
+        "strategy": "baseline",
+        "edge_threshold": 9.0,
+        "min_prob": 0.55,
+        "n_bets": 545,
+        "wins": 282,
+        "win_rate": 0.5174,
+        "total_pnl": 29.18,
+        "roi": 0.0535,
+        "avg_edge": 28.7,
+        "avg_odds": 2.12
+      },
+      "total_combos": 720
+    }
+  }
+}

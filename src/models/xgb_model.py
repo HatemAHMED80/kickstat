@@ -24,14 +24,14 @@ class XGBStackingModel:
 
     def __init__(
         self,
-        max_depth: int = 4,
+        max_depth: int = 3,
         learning_rate: float = 0.06,
-        n_estimators: int = 100,
-        min_child_weight: int = 10,
+        n_estimators: int = 80,
+        min_child_weight: int = 20,
         subsample: float = 0.66,
         colsample_bytree: float = 0.62,
-        reg_alpha: float = 1.90,
-        reg_lambda: float = 4.86,
+        reg_alpha: float = 3.0,
+        reg_lambda: float = 8.0,
         scale_pos_weight: float = 1.71,
         early_stopping_rounds: int = 20,
     ):

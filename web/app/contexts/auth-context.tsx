@@ -29,9 +29,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fallbackUser = (supabaseUser: User): AuthUser => ({
+    id: supabaseUser.id,
+    email: supabaseUser.email || '',
+    fullName: supabaseUser.user_metadata?.full_name,
+    subscriptionTier: 'free',
+    subscriptionStatus: 'inactive',
+    telegramConnected: false,
+    telegramAlertsEnabled: false,
+  });
+
   const fetchUserProfile = async (supabaseUser: User, accessToken: string) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) {
+      // No backend API configured — use Supabase user info directly
+      setUser(fallbackUser(supabaseUser));
+      return;
+    }
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const response = await fetch(
         `${apiUrl}/api/v1/auth/me`,
         {
@@ -53,28 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           telegramAlertsEnabled: data.telegram_alerts_enabled,
         });
       } else {
-        // Fallback to basic Supabase user info
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          fullName: supabaseUser.user_metadata?.full_name,
-          subscriptionTier: 'free',
-          subscriptionStatus: 'inactive',
-          telegramConnected: false,
-          telegramAlertsEnabled: false,
-        });
+        setUser(fallbackUser(supabaseUser));
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        fullName: supabaseUser.user_metadata?.full_name,
-        subscriptionTier: 'free',
-        subscriptionStatus: 'inactive',
-        telegramConnected: false,
-        telegramAlertsEnabled: false,
-      });
+      setUser(fallbackUser(supabaseUser));
     }
   };
 
@@ -94,6 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (initialSession?.user) {
         fetchUserProfile(initialSession.user, initialSession.access_token);
       }
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
 

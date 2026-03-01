@@ -58,8 +58,13 @@ class EnsemblePrediction:
 class EnsemblePredictor:
     """Weighted ensemble of Dixon-Coles + ELO, with optional XGBoost stacking.
 
-    When XGBoost is available and fitted, it replaces the weighted average
-    for 1X2 probabilities. Falls back to DC+ELO weighted average otherwise.
+    When XGBoost is available and fitted, it can adjust the DC+ELO baseline.
+    Falls back to DC+ELO weighted average otherwise.
+
+    xgb_markets: set of outcome classes where XGBoost is allowed to override
+    the DC+ELO baseline. For outcomes NOT in this set, DC+ELO is kept pure.
+    Example: {"draw"} = XGB only adjusts draw, home/away stay DC+ELO.
+    If None, XGBoost overrides all outcomes (legacy behavior).
     """
 
     def __init__(
@@ -69,11 +74,13 @@ class EnsemblePredictor:
         dc_weight: float = 0.65,
         elo_weight: float = 0.35,
         xgb_model=None,
+        xgb_markets: set[str] | None = None,
     ):
         self.dc = dc_model
         self.elo = elo_model
         self.weights = {"dixon_coles": dc_weight, "elo": elo_weight}
         self.xgb = xgb_model
+        self.xgb_markets = xgb_markets
 
     def predict(
         self,
@@ -93,27 +100,43 @@ class EnsemblePredictor:
         # ELO prediction (1X2 only)
         elo_probs = self.elo.predict_1x2(home_team, away_team)
 
+        # Compute DC+ELO baseline (always needed as fallback or for capping)
+        w_dc = self.weights["dixon_coles"]
+        w_elo = self.weights["elo"]
+        base_home = w_dc * dc_probs["home"] + w_elo * elo_probs["home"]
+        base_draw = w_dc * dc_probs["draw"] + w_elo * elo_probs["draw"]
+        base_away = w_dc * dc_probs["away"] + w_elo * elo_probs["away"]
+        base_total = base_home + base_draw + base_away
+        base_home /= base_total
+        base_draw /= base_total
+        base_away /= base_total
+
         # XGBoost stacking path
         if self.xgb is not None and self.xgb.is_fitted and match_features is not None:
             xgb_probs = self.xgb.predict_proba(match_features)
-            home = float(xgb_probs[0])
-            draw = float(xgb_probs[1])
-            away = float(xgb_probs[2])
-            used_weights = {"xgboost": 1.0}
-        else:
-            # Fallback: weighted average of DC + ELO
-            w_dc = self.weights["dixon_coles"]
-            w_elo = self.weights["elo"]
+            xgb_home = float(xgb_probs[0])
+            xgb_draw = float(xgb_probs[1])
+            xgb_away = float(xgb_probs[2])
 
-            home = w_dc * dc_probs["home"] + w_elo * elo_probs["home"]
-            draw = w_dc * dc_probs["draw"] + w_elo * elo_probs["draw"]
-            away = w_dc * dc_probs["away"] + w_elo * elo_probs["away"]
+            # Selective XGB: only use XGB for specified markets
+            if self.xgb_markets is not None:
+                home = xgb_home if "home" in self.xgb_markets else base_home
+                draw = xgb_draw if "draw" in self.xgb_markets else base_draw
+                away = xgb_away if "away" in self.xgb_markets else base_away
+            else:
+                home, draw, away = xgb_home, xgb_draw, xgb_away
 
-            # Normalize
+            # Re-normalize
             total = home + draw + away
             home /= total
             draw /= total
             away /= total
+
+            used_weights = {"xgboost": 1.0, "xgb_markets": list(self.xgb_markets or ["home", "draw", "away"])}
+        else:
+            home = base_home
+            draw = base_draw
+            away = base_away
             used_weights = self.weights
 
         # Model agreement: 1 = perfect agreement, 0 = maximum disagreement

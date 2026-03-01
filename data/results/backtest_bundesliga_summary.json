@@ -1,150 +1,538 @@
 {
   "league": "bundesliga",
-  "elapsed_seconds": 6317.4,
-  "total_matches": 1421,
-  "matches_tested": 1301,
+  "elapsed_seconds": 38.3,
+  "total_matches": 1430,
+  "matches_tested": 1310,
   "matches_with_odds": 1254,
   "configs": {
     "baseline": {
       "calibration": {
-        "brier_score": 0.6016,
-        "log_loss": 1.0071,
-        "ece": 0.0221,
-        "accuracy": 0.5088,
+        "brier_score": 0.6025,
+        "log_loss": 1.0083,
+        "ece": 0.0146,
+        "accuracy": 0.5015,
         "is_acceptable": true,
-        "n_predictions": 1301
+        "n_predictions": 1310
       },
       "betting": {
-        "total_bets": 630,
-        "wins": 200,
-        "win_rate": 0.3175,
-        "total_pnl": -36.45,
-        "roi": -0.0579,
-        "avg_edge": 25.4,
+        "total_bets": 1728,
+        "wins": 854,
+        "win_rate": 0.4942,
+        "total_pnl": -70.44,
+        "roi": -0.0408,
+        "avg_edge": 24.1,
         "by_market": {
-          "home": {
-            "bets": 421,
-            "wins": 159,
-            "win_rate": 0.3777,
-            "pnl": -24.22,
-            "roi": -0.0575,
-            "avg_edge": 25.2
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 178,
+            "wins": 63,
+            "win_rate": 0.3539,
+            "pnl": -17.45,
+            "roi": -0.098,
+            "avg_edge": 33.0
           },
           "draw": {
-            "bets": 209,
-            "wins": 41,
-            "win_rate": 0.1962,
-            "pnl": -12.23,
-            "roi": -0.0585,
-            "avg_edge": 25.7
+            "bets": 18,
+            "wins": 4,
+            "win_rate": 0.2222,
+            "pnl": 0.48,
+            "roi": 0.0267,
+            "avg_edge": 28.6
+          },
+          "home": {
+            "bets": 137,
+            "wins": 54,
+            "win_rate": 0.3942,
+            "pnl": -25.18,
+            "roi": -0.1838,
+            "avg_edge": 21.6
+          },
+          "over25": {
+            "bets": 508,
+            "wins": 303,
+            "win_rate": 0.5965,
+            "pnl": -10.97,
+            "roi": -0.0216,
+            "avg_edge": 20.0
+          },
+          "under25": {
+            "bets": 144,
+            "wins": 77,
+            "win_rate": 0.5347,
+            "pnl": 12.44,
+            "roi": 0.0864,
+            "avg_edge": 25.9
           }
         }
       }
     },
     "xgb": {
       "calibration": {
-        "brier_score": 0.6088,
-        "log_loss": 1.0189,
-        "ece": 0.0156,
-        "accuracy": 0.5127,
+        "brier_score": 0.6045,
+        "log_loss": 1.012,
+        "ece": 0.0195,
+        "accuracy": 0.5107,
         "is_acceptable": true,
-        "n_predictions": 1301
+        "n_predictions": 1310
       },
       "betting": {
-        "total_bets": 889,
-        "wins": 244,
-        "win_rate": 0.2745,
-        "total_pnl": -43.59,
-        "roi": -0.049,
-        "avg_edge": 42.7,
+        "total_bets": 1681,
+        "wins": 787,
+        "win_rate": 0.4682,
+        "total_pnl": -80.12,
+        "roi": -0.0477,
+        "avg_edge": 25.7,
         "by_market": {
-          "home": {
-            "bets": 520,
-            "wins": 166,
-            "win_rate": 0.3192,
-            "pnl": -67.84,
-            "roi": -0.1305,
-            "avg_edge": 38.9
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 84,
+            "wins": 34,
+            "win_rate": 0.4048,
+            "pnl": 6.58,
+            "roi": 0.0783,
+            "avg_edge": 33.9
           },
           "draw": {
-            "bets": 369,
-            "wins": 78,
-            "win_rate": 0.2114,
-            "pnl": 24.25,
-            "roi": 0.0657,
-            "avg_edge": 48.0
+            "bets": 81,
+            "wins": 13,
+            "win_rate": 0.1605,
+            "pnl": -27.33,
+            "roi": -0.3374,
+            "avg_edge": 40.0
+          },
+          "home": {
+            "bets": 294,
+            "wins": 124,
+            "win_rate": 0.4218,
+            "pnl": -14.84,
+            "roi": -0.0505,
+            "avg_edge": 31.0
+          },
+          "over25": {
+            "bets": 432,
+            "wins": 242,
+            "win_rate": 0.5602,
+            "pnl": -9.9,
+            "roi": -0.0229,
+            "avg_edge": 19.6
+          },
+          "under25": {
+            "bets": 47,
+            "wins": 21,
+            "win_rate": 0.4468,
+            "pnl": -4.87,
+            "roi": -0.1036,
+            "avg_edge": 24.4
+          }
+        }
+      }
+    },
+    "xgb_draw": {
+      "calibration": {
+        "brier_score": 0.6023,
+        "log_loss": 1.0087,
+        "ece": 0.0192,
+        "accuracy": 0.5008,
+        "is_acceptable": true,
+        "n_predictions": 1310
+      },
+      "betting": {
+        "total_bets": 1590,
+        "wins": 748,
+        "win_rate": 0.4704,
+        "total_pnl": -93.48,
+        "roi": -0.0588,
+        "avg_edge": 24.0,
+        "by_market": {
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 168,
+            "wins": 60,
+            "win_rate": 0.3571,
+            "pnl": -15.01,
+            "roi": -0.0893,
+            "avg_edge": 33.0
+          },
+          "draw": {
+            "bets": 50,
+            "wins": 8,
+            "win_rate": 0.16,
+            "pnl": -17.18,
+            "roi": -0.3436,
+            "avg_edge": 28.9
+          },
+          "home": {
+            "bets": 150,
+            "wins": 64,
+            "win_rate": 0.4267,
+            "pnl": -16.76,
+            "roi": -0.1117,
+            "avg_edge": 22.2
+          },
+          "over25": {
+            "bets": 432,
+            "wins": 242,
+            "win_rate": 0.5602,
+            "pnl": -9.9,
+            "roi": -0.0229,
+            "avg_edge": 19.6
+          },
+          "under25": {
+            "bets": 47,
+            "wins": 21,
+            "win_rate": 0.4468,
+            "pnl": -4.87,
+            "roi": -0.1036,
+            "avg_edge": 24.4
           }
         }
       }
     },
     "xgb_cal": {
       "calibration": {
-        "brier_score": 0.613,
-        "log_loss": 1.1021,
-        "ece": 0.0196,
-        "accuracy": 0.5081,
+        "brier_score": 0.6125,
+        "log_loss": 1.2216,
+        "ece": 0.034,
+        "accuracy": 0.5053,
         "is_acceptable": true,
-        "n_predictions": 1301
+        "n_predictions": 1310
       },
       "betting": {
-        "total_bets": 981,
-        "wins": 290,
-        "win_rate": 0.2956,
-        "total_pnl": 16.23,
-        "roi": 0.0165,
-        "avg_edge": 45.9,
+        "total_bets": 1809,
+        "wins": 853,
+        "win_rate": 0.4715,
+        "total_pnl": -55.45,
+        "roi": -0.0307,
+        "avg_edge": 27.5,
         "by_market": {
-          "home": {
-            "bets": 592,
-            "wins": 203,
-            "win_rate": 0.3429,
-            "pnl": -51.75,
-            "roi": -0.0874,
-            "avg_edge": 42.0
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 90,
+            "wins": 38,
+            "win_rate": 0.4222,
+            "pnl": 4.67,
+            "roi": 0.0519,
+            "avg_edge": 32.9
           },
           "draw": {
-            "bets": 389,
-            "wins": 87,
-            "win_rate": 0.2237,
-            "pnl": 67.98,
-            "roi": 0.1748,
-            "avg_edge": 51.8
+            "bets": 116,
+            "wins": 28,
+            "win_rate": 0.2414,
+            "pnl": 6.15,
+            "roi": 0.053,
+            "avg_edge": 40.2
+          },
+          "home": {
+            "bets": 381,
+            "wins": 171,
+            "win_rate": 0.4488,
+            "pnl": -21.74,
+            "roi": -0.0571,
+            "avg_edge": 37.4
+          },
+          "over25": {
+            "bets": 432,
+            "wins": 242,
+            "win_rate": 0.5602,
+            "pnl": -9.9,
+            "roi": -0.0229,
+            "avg_edge": 19.6
+          },
+          "under25": {
+            "bets": 47,
+            "wins": 21,
+            "win_rate": 0.4468,
+            "pnl": -4.87,
+            "roi": -0.1036,
+            "avg_edge": 24.4
           }
         }
       }
     },
     "xgb_cal_bandit": {
       "calibration": {
-        "brier_score": 0.613,
-        "log_loss": 1.1021,
-        "ece": 0.0196,
-        "accuracy": 0.5081,
+        "brier_score": 0.6125,
+        "log_loss": 1.2216,
+        "ece": 0.034,
+        "accuracy": 0.5053,
         "is_acceptable": true,
-        "n_predictions": 1301
+        "n_predictions": 1310
       },
       "betting": {
-        "total_bets": 631,
-        "wins": 190,
-        "win_rate": 0.3011,
-        "total_pnl": 12.6,
-        "roi": 0.02,
-        "avg_edge": 46.6,
+        "total_bets": 1809,
+        "wins": 853,
+        "win_rate": 0.4715,
+        "total_pnl": -55.45,
+        "roi": -0.0307,
+        "avg_edge": 27.5,
         "by_market": {
-          "home": {
-            "bets": 412,
-            "wins": 144,
-            "win_rate": 0.3495,
-            "pnl": -8.38,
-            "roi": -0.0203,
-            "avg_edge": 42.3
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 90,
+            "wins": 38,
+            "win_rate": 0.4222,
+            "pnl": 4.67,
+            "roi": 0.0519,
+            "avg_edge": 32.9
           },
           "draw": {
-            "bets": 219,
-            "wins": 46,
-            "win_rate": 0.21,
-            "pnl": 20.98,
-            "roi": 0.0958,
-            "avg_edge": 54.8
+            "bets": 116,
+            "wins": 28,
+            "win_rate": 0.2414,
+            "pnl": 6.15,
+            "roi": 0.053,
+            "avg_edge": 40.2
+          },
+          "home": {
+            "bets": 381,
+            "wins": 171,
+            "win_rate": 0.4488,
+            "pnl": -21.74,
+            "roi": -0.0571,
+            "avg_edge": 37.4
+          },
+          "over25": {
+            "bets": 432,
+            "wins": 242,
+            "win_rate": 0.5602,
+            "pnl": -9.9,
+            "roi": -0.0229,
+            "avg_edge": 19.6
+          },
+          "under25": {
+            "bets": 47,
+            "wins": 21,
+            "win_rate": 0.4468,
+            "pnl": -4.87,
+            "roi": -0.1036,
+            "avg_edge": 24.4
+          }
+        }
+      }
+    },
+    "hybrid": {
+      "calibration": {
+        "brier_score": 0.6023,
+        "log_loss": 1.0087,
+        "ece": 0.0192,
+        "accuracy": 0.5008,
+        "is_acceptable": true,
+        "n_predictions": 1310
+      },
+      "betting": {
+        "total_bets": 1763,
+        "wins": 865,
+        "win_rate": 0.4906,
+        "total_pnl": -77.24,
+        "roi": -0.0438,
+        "avg_edge": 24.1,
+        "by_market": {
+          "ah_away": {
+            "bets": 472,
+            "wins": 218,
+            "win_rate": 0.4619,
+            "pnl": -25.03,
+            "roi": -0.053,
+            "avg_edge": 26.1
+          },
+          "ah_home": {
+            "bets": 271,
+            "wins": 135,
+            "win_rate": 0.4982,
+            "pnl": -4.73,
+            "roi": -0.0175,
+            "avg_edge": 22.2
+          },
+          "away": {
+            "bets": 168,
+            "wins": 60,
+            "win_rate": 0.3571,
+            "pnl": -15.01,
+            "roi": -0.0893,
+            "avg_edge": 33.0
+          },
+          "draw": {
+            "bets": 50,
+            "wins": 8,
+            "win_rate": 0.16,
+            "pnl": -17.18,
+            "roi": -0.3436,
+            "avg_edge": 28.9
+          },
+          "home": {
+            "bets": 150,
+            "wins": 64,
+            "win_rate": 0.4267,
+            "pnl": -16.76,
+            "roi": -0.1117,
+            "avg_edge": 22.2
+          },
+          "over25": {
+            "bets": 508,
+            "wins": 303,
+            "win_rate": 0.5965,
+            "pnl": -10.97,
+            "roi": -0.0216,
+            "avg_edge": 20.0
+          },
+          "under25": {
+            "bets": 144,
+            "wins": 77,
+            "win_rate": 0.5347,
+            "pnl": 12.44,
+            "roi": 0.0864,
+            "avg_edge": 25.9
+          }
+        }
+      }
+    },
+    "optimal": {
+      "calibration": {
+        "brier_score": 0.6085,
+        "log_loss": 1.2358,
+        "ece": 0.0295,
+        "accuracy": 0.5122,
+        "is_acceptable": true,
+        "n_predictions": 1310
+      },
+      "betting": {
+        "total_bets": 560,
+        "wins": 249,
+        "win_rate": 0.4446,
+        "total_pnl": -4.14,
+        "roi": -0.0074,
+        "avg_edge": 36.7,
+        "by_market": {
+          "ah_away": {
+            "bets": 70,
+            "wins": 27,
+            "win_rate": 0.3857,
+            "pnl": -17.44,
+            "roi": -0.2491,
+            "avg_edge": 48.0
+          },
+          "ah_home": {
+            "bets": 27,
+            "wins": 15,
+            "win_rate": 0.5556,
+            "pnl": 3.08,
+            "roi": 0.1141,
+            "avg_edge": 51.9
+          },
+          "away": {
+            "bets": 95,
+            "wins": 41,
+            "win_rate": 0.4316,
+            "pnl": 6.07,
+            "roi": 0.0639,
+            "avg_edge": 31.9
+          },
+          "draw": {
+            "bets": 140,
+            "wins": 30,
+            "win_rate": 0.2143,
+            "pnl": -6.66,
+            "roi": -0.0476,
+            "avg_edge": 45.8
+          },
+          "home": {
+            "bets": 54,
+            "wins": 36,
+            "win_rate": 0.6667,
+            "pnl": 7.12,
+            "roi": 0.1319,
+            "avg_edge": 22.3
+          },
+          "over25": {
+            "bets": 110,
+            "wins": 57,
+            "win_rate": 0.5182,
+            "pnl": -15.32,
+            "roi": -0.1393,
+            "avg_edge": 28.3
+          },
+          "under25": {
+            "bets": 64,
+            "wins": 43,
+            "win_rate": 0.6719,
+            "pnl": 19.01,
+            "roi": 0.297,
+            "avg_edge": 31.7
           }
         }
       }
@@ -153,86 +541,21 @@
   "xgb_info": {
     "train_samples": 1008,
     "feature_importance": {
-      "elo_diff": "0.0954",
-      "elo_home_prob": "0.0434",
-      "elo_away_prob": "0.0363",
-      "dominance_diff": "0.0303",
-      "dc_home_prob": "0.0297",
-      "dc_away_prob": "0.0227",
-      "goals_diff": "0.0222",
-      "elo_home_rating": "0.0193",
-      "away_goals_scored_5": "0.019",
-      "home_corners_pg_5": "0.0177",
-      "away_clean_sheet_rate_5": "0.0173",
-      "h2h_home_win_rate": "0.0171",
-      "elo_away_rating": "0.0167",
-      "away_sot_ratio_5": "0.0163",
-      "home_btts_rate_5": "0.0161"
-    }
-  },
-  "bandit_info": {
-    "segments": 12,
-    "summary": {
-      "heavy_fav|pos_edge|high_goals": {
-        "best_arm": "1x2_draw",
-        "best_roi": 61.6,
-        "n_arms": 6
-      },
-      "balanced|pos_edge|high_goals": {
-        "best_arm": "1x2_draw",
-        "best_roi": 14.1,
-        "n_arms": 6
-      },
-      "slight_fav|pos_edge|low_goals": {
-        "best_arm": "over25",
-        "best_roi": 26.4,
-        "n_arms": 6
-      },
-      "slight_fav|pos_edge|high_goals": {
-        "best_arm": "under25",
-        "best_roi": 28.8,
-        "n_arms": 6
-      },
-      "balanced|pos_edge|low_goals": {
-        "best_arm": "1x2_home",
-        "best_roi": 118.0,
-        "n_arms": 6
-      },
-      "slight_fav|no_edge|high_goals": {
-        "best_arm": "1x2_draw",
-        "best_roi": 59.5,
-        "n_arms": 6
-      },
-      "slight_fav|no_edge|low_goals": {
-        "best_arm": "over25",
-        "best_roi": 105.0,
-        "n_arms": 6
-      },
-      "balanced|no_edge|high_goals": {
-        "best_arm": "1x2_away",
-        "best_roi": 143.8,
-        "n_arms": 6
-      },
-      "balanced|no_edge|low_goals": {
-        "best_arm": "1x2_draw",
-        "best_roi": 84.3,
-        "n_arms": 6
-      },
-      "heavy_fav|no_edge|high_goals": {
-        "best_arm": "1x2_home",
-        "best_roi": 8.7,
-        "n_arms": 6
-      },
-      "heavy_fav|pos_edge|low_goals": {
-        "best_arm": "1x2_away",
-        "best_roi": 62.0,
-        "n_arms": 6
-      },
-      "heavy_fav|no_edge|low_goals": {
-        "best_arm": "under25",
-        "best_roi": 39.4,
-        "n_arms": 4
-      }
+      "elo_diff": "0.075",
+      "dc_home_prob": "0.0487",
+      "dominance_diff": "0.0446",
+      "dc_away_prob": "0.0337",
+      "goals_diff": "0.0253",
+      "elo_away_rating": "0.0231",
+      "dc_home_defense": "0.0225",
+      "away_goals_scored_5": "0.0222",
+      "away_dominance_5": "0.0221",
+      "dc_away_attack": "0.0218",
+      "h2h_home_win_rate": "0.0205",
+      "away_sot_ratio_5": "0.0203",
+      "home_fouls_pg_5": "0.02",
+      "elo_home_away_ratio": "0.02",
+      "dc_away_defense": "0.0198"
     }
   }
 }

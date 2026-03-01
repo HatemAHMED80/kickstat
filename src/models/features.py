@@ -17,8 +17,9 @@ FEATURE_NAMES: list[str] = [
     "elo_home_prob", "elo_draw_prob", "elo_away_prob",
     # DC team strength (4)
     "dc_home_attack", "dc_home_defense", "dc_away_attack", "dc_away_defense",
-    # ELO ratings (3)
+    # ELO ratings (3 global + 4 contextual)
     "elo_home_rating", "elo_away_rating", "elo_diff",
+    "elo_home_at_home", "elo_away_at_away", "elo_contextual_diff", "elo_home_away_ratio",
     # Form - rolling 5 (8)
     "home_ppg_5", "away_ppg_5",
     "home_goals_scored_5", "away_goals_scored_5",
@@ -143,11 +144,30 @@ def compute_features(
         f["elo_home_rating"] = elo_model.get_rating(home_team)
         f["elo_away_rating"] = elo_model.get_rating(away_team)
         f["elo_diff"] = f["elo_home_rating"] - f["elo_away_rating"]
+        # Contextual ELO duo features
+        if hasattr(elo_model, "get_contextual_rating"):
+            f["elo_home_at_home"] = elo_model.get_contextual_rating(home_team, "home")
+            f["elo_away_at_away"] = elo_model.get_contextual_rating(away_team, "away")
+            f["elo_contextual_diff"] = f["elo_home_at_home"] - f["elo_away_at_away"]
+            # Ratio: how much does context deviate from global (>1 = better at home/away than average)
+            global_avg = (f["elo_home_rating"] + f["elo_away_rating"]) / 2
+            if global_avg > 0:
+                f["elo_home_away_ratio"] = f["elo_home_at_home"] / f["elo_away_at_away"] if f["elo_away_at_away"] > 0 else 1.0
+            else:
+                f["elo_home_away_ratio"] = 1.0
+        else:
+            f["elo_home_at_home"] = f["elo_home_rating"]
+            f["elo_away_at_away"] = f["elo_away_rating"]
+            f["elo_contextual_diff"] = f["elo_diff"]
+            f["elo_home_away_ratio"] = 1.0
     else:
         for k in ["elo_home_prob", "elo_draw_prob", "elo_away_prob"]:
             f[k] = 1 / 3
         f["elo_home_rating"] = f["elo_away_rating"] = 1500.0
         f["elo_diff"] = 0.0
+        f["elo_home_at_home"] = f["elo_away_at_away"] = 1500.0
+        f["elo_contextual_diff"] = 0.0
+        f["elo_home_away_ratio"] = 1.0
 
     # === Form + shot stats (rolling 5) ===
     home_recent = history.get_team_matches(home_team, match_date, last_n=5)

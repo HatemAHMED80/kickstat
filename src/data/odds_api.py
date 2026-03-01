@@ -48,8 +48,8 @@ class OddsAPIClient:
     def get_odds(
         self,
         league: str = "ligue_1",
-        markets: str = "h2h,totals",
-        regions: str = "eu",
+        markets: str = "h2h,totals,spreads",
+        regions: str = "eu,uk",
     ) -> list[dict]:
         """Fetch current odds for upcoming matches.
 
@@ -73,8 +73,8 @@ class OddsAPIClient:
 def extract_best_odds(match_odds: dict) -> dict:
     """Extract best available odds across all bookmakers for a match.
 
-    Returns dict with keys: home, draw, away, over15, under15, over25, under25, over35, under35
-    and their associated best bookmaker.
+    Returns dict with keys: home, draw, away, over15, under15, over25, under25,
+    over35, under35, ah_home, ah_away and their associated best bookmaker.
     """
     best = {
         "home": {"odds": 0, "bookmaker": None},
@@ -86,6 +86,8 @@ def extract_best_odds(match_odds: dict) -> dict:
         "under25": {"odds": 0, "bookmaker": None},
         "over35": {"odds": 0, "bookmaker": None},
         "under35": {"odds": 0, "bookmaker": None},
+        "ah_home": {"odds": 0, "bookmaker": None, "line": None},
+        "ah_away": {"odds": 0, "bookmaker": None, "line": None},
     }
 
     for bookmaker in match_odds.get("bookmakers", []):
@@ -119,6 +121,38 @@ def extract_best_odds(match_odds: dict) -> dict:
                         key = "over35" if is_over else "under35"
                         if outcome["price"] > best[key]["odds"]:
                             best[key] = {"odds": outcome["price"], "bookmaker": name}
+            elif market["key"] == "spreads":
+                home_team = match_odds.get("home_team", "")
+                for outcome in market["outcomes"]:
+                    point = outcome.get("point")
+                    price = outcome.get("price", 0)
+                    if point is None or price <= 1.0:
+                        continue
+                    is_home = outcome.get("name") == home_team
+                    if is_home and point < 0:
+                        # Home handicap (e.g., -1.5)
+                        if price > best["ah_home"]["odds"]:
+                            best["ah_home"] = {"odds": price, "bookmaker": name, "line": point}
+                    elif not is_home and point > 0:
+                        # Away handicap (e.g., +1.5)
+                        if price > best["ah_away"]["odds"]:
+                            best["ah_away"] = {"odds": price, "bookmaker": name, "line": point}
+
+    # Sanity check: filter absurd odds for totals markets.
+    # Over 1.5 should never be above ~3.0, Under 1.5 never above ~10.0,
+    # Over 2.5 never above ~6.0, Over 3.5 never above ~10.0.
+    MAX_SANE_ODDS = {
+        "over15": 3.5, "under15": 12.0,
+        "over25": 7.0, "under25": 7.0,
+        "over35": 12.0, "under35": 4.0,
+    }
+    for key, max_odds in MAX_SANE_ODDS.items():
+        if best[key]["odds"] > max_odds:
+            logger.warning(
+                f"Filtering absurd {key} odds: {best[key]['odds']} > {max_odds} "
+                f"(bookmaker: {best[key]['bookmaker']})"
+            )
+            best[key] = {"odds": 0, "bookmaker": None}
 
     return best
 

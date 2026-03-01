@@ -156,6 +156,12 @@ def _resolve_bet(bet: str, home_score: int, away_score: int, odds: float) -> tup
             won = diff >= 3
         case "spread_away_p25":
             won = diff <= 2
+        case "ah_home":
+            # Default -1.5 line: home must win by 2+
+            won = diff >= 2
+        case "ah_away":
+            # Default +1.5 line: away covers if home doesn't win by 2+
+            won = diff <= 1
         case _:
             return None, 0.0
 

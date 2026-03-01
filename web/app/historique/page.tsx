@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import NavBar from '../components/NavBar';
+import { getSupabase } from '../lib/supabase';
 import {
   LineChart,
   Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -97,9 +100,26 @@ function ChartTooltip({ active, payload, label }: any) {
   const roi = payload[0]?.value as number;
   return (
     <div className="bg-[#18181b] border border-white/10 rounded-lg px-3 py-2 text-xs">
-      <p className="text-gray-400 mb-1">{label}</p>
+      <p className="text-zinc-400 mb-1">{label}</p>
       <p className={`font-bold ${roi >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
         ROI cumulé : {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+      </p>
+    </div>
+  );
+}
+
+function BankrollTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const val = payload[0]?.value as number;
+  const profit = val - 1000;
+  return (
+    <div className="bg-[#18181b] border border-white/10 rounded-lg px-3 py-2 text-xs">
+      <p className="text-zinc-400 mb-1">{label}</p>
+      <p className={`font-bold ${val >= 1000 ? 'text-emerald-400' : 'text-red-400'}`}>
+        Capital : {val.toLocaleString('fr-FR')} €
+      </p>
+      <p className={`text-[11px] ${profit >= 0 ? 'text-emerald-400/70' : 'text-red-400/70'}`}>
+        {profit >= 0 ? '+' : ''}{profit.toLocaleString('fr-FR')} € de profit
       </p>
     </div>
   );
@@ -111,18 +131,53 @@ function ChartTooltip({ active, payload, label }: any) {
 export default function HistoriquePage() {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'won' | 'lost' | 'pending'>('all');
+  const [filter, setFilter] = useState<'all' | 'won' | 'lost'>('all');
   const [leagueFilter, setLeagueFilter] = useState<string>('all');
 
   useEffect(() => {
-    fetch('/history.json')
-      .then(r => r.json())
-      .then((data: HistoryRecord[]) => {
-        // Sort newest first for the table
-        setHistory([...data].reverse());
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    async function fetchAll() {
+      try {
+        const supabase = getSupabase();
+        const PAGE = 1000;
+        let all: HistoryRecord[] = [];
+        let from = 0;
+
+        while (true) {
+          const { data, error } = await supabase
+            .from('bets')
+            .select('*')
+            .eq('resolved', true)
+            .order('date', { ascending: false })
+            .range(from, from + PAGE - 1);
+
+          if (error || !data) break;
+
+          all = all.concat(data as HistoryRecord[]);
+          if (data.length < PAGE) break;
+          from += PAGE;
+        }
+
+        if (all.length > 0) {
+          setHistory(all);
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error('Supabase fetch failed:', e);
+      }
+
+      // Fallback to static JSON
+      try {
+        const res = await fetch('/history.json');
+        const json: HistoryRecord[] = await res.json();
+        setHistory(json);
+      } catch (e) {
+        console.error('History JSON fetch failed:', e);
+      }
+      setLoading(false);
+    }
+
+    fetchAll();
   }, []);
 
   // ---------------------------------------------------------------------------
@@ -159,13 +214,55 @@ export default function HistoriquePage() {
   })();
 
   // ---------------------------------------------------------------------------
+  // Bankroll simulation: 1000€ de départ, mise fixe 10€ (1%) par pari
+  // ---------------------------------------------------------------------------
+  const STARTING_BANKROLL = 1000;
+  const UNIT_SIZE = 10; // 1% du capital initial
+
+  const bankrollData = (() => {
+    const chrono = [...history].reverse().filter(h => h.resolved);
+    let bankroll = STARTING_BANKROLL;
+    let maxBankroll = STARTING_BANKROLL;
+    let minBankroll = STARTING_BANKROLL;
+    return chrono.map((h, i) => {
+      bankroll += (h.pnl ?? 0) * UNIT_SIZE;
+      bankroll = parseFloat(bankroll.toFixed(2));
+      if (bankroll > maxBankroll) maxBankroll = bankroll;
+      if (bankroll < minBankroll) minBankroll = bankroll;
+      return {
+        label: formatDate(h.date),
+        bankroll,
+        bet: i + 1,
+        maxBankroll,
+        minBankroll,
+      };
+    });
+  })();
+
+  const finalBankroll = bankrollData.length > 0 ? bankrollData[bankrollData.length - 1].bankroll : STARTING_BANKROLL;
+  const totalProfit = finalBankroll - STARTING_BANKROLL;
+  const bankrollROI = ((totalProfit / STARTING_BANKROLL) * 100);
+  const maxDrawdown = (() => {
+    let peak = STARTING_BANKROLL;
+    let maxDd = 0;
+    const chrono = [...history].reverse().filter(h => h.resolved);
+    let bankroll = STARTING_BANKROLL;
+    for (const h of chrono) {
+      bankroll += (h.pnl ?? 0) * UNIT_SIZE;
+      if (bankroll > peak) peak = bankroll;
+      const dd = ((peak - bankroll) / peak) * 100;
+      if (dd > maxDd) maxDd = dd;
+    }
+    return maxDd;
+  })();
+
+  // ---------------------------------------------------------------------------
   // Filtered table
   // ---------------------------------------------------------------------------
   const filtered = history.filter(h => {
     if (leagueFilter !== 'all' && h.league !== leagueFilter) return false;
     if (filter === 'won') return h.won === true;
     if (filter === 'lost') return h.won === false;
-    if (filter === 'pending') return !h.resolved;
     return true;
   });
 
@@ -174,39 +271,25 @@ export default function HistoriquePage() {
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
-      {/* Gradient background */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_50%_at_20%_-10%,rgba(124,58,237,0.08),transparent),radial-gradient(ellipse_60%_40%_at_80%_60%,rgba(219,39,119,0.05),transparent)]" />
+      <NavBar />
 
-      {/* Navigation */}
-      <nav className="relative z-50 border-b border-white/5 bg-[#09090b]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            Kick<span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">stat</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
-            <Link href="/historique" className="text-sm text-violet-400 font-semibold">Historique</Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-1">Historique des paris</h1>
-          <p className="text-gray-500 text-sm">Résultats réels — mis à jour automatiquement après chaque match</p>
+          <p className="text-zinc-500 text-sm">Résultats réels — mis à jour automatiquement après chaque match</p>
         </div>
 
         {/* Loading */}
         {loading && (
-          <div className="text-center py-20 text-gray-500">Chargement…</div>
+          <div className="text-center py-20 text-zinc-500">Chargement…</div>
         )}
 
         {!loading && history.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg mb-2">Aucun historique disponible</p>
-            <p className="text-gray-600 text-sm">
+            <p className="text-zinc-500 text-lg mb-2">Aucun historique disponible</p>
+            <p className="text-zinc-600 text-sm">
               Les résultats s'affichent automatiquement après chaque match.
               <br />Lancez <code className="bg-white/5 px-1.5 py-0.5 rounded text-violet-300">python scripts/fetch_results.py</code> pour les mettre à jour.
             </p>
@@ -217,38 +300,35 @@ export default function HistoriquePage() {
           <>
             {/* Stats cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-              <div className="bg-white/3 border border-white/8 rounded-xl p-4">
-                <p className="text-gray-500 text-xs mb-1">Paris totaux</p>
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <p className="text-zinc-500 text-xs mb-1">Paris totaux</p>
                 <p className="text-2xl font-bold text-white">{resolved.length}</p>
-                {history.length > resolved.length && (
-                  <p className="text-xs text-gray-600 mt-0.5">{history.length - resolved.length} en attente</p>
-                )}
               </div>
-              <div className="bg-white/3 border border-white/8 rounded-xl p-4">
-                <p className="text-gray-500 text-xs mb-1">Taux de réussite</p>
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <p className="text-zinc-500 text-xs mb-1">Taux de réussite</p>
                 <p className="text-2xl font-bold text-white">{winRate.toFixed(1)}%</p>
-                <p className="text-xs text-gray-600 mt-0.5">{wins}V · {losses}D{pushes > 0 ? ` · ${pushes}N` : ''}</p>
+                <p className="text-xs text-zinc-600 mt-0.5">{wins}V · {losses}D{pushes > 0 ? ` · ${pushes}N` : ''}</p>
               </div>
-              <div className="bg-white/3 border border-white/8 rounded-xl p-4">
-                <p className="text-gray-500 text-xs mb-1">ROI réel</p>
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <p className="text-zinc-500 text-xs mb-1">ROI réel</p>
                 <p className={`text-2xl font-bold ${roi >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                   {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
                 </p>
-                <p className="text-xs text-gray-600 mt-0.5">par pari (mise fixe)</p>
+                <p className="text-xs text-zinc-600 mt-0.5">par pari (mise fixe)</p>
               </div>
-              <div className="bg-white/3 border border-white/8 rounded-xl p-4">
-                <p className="text-gray-500 text-xs mb-1">P&L total</p>
+              <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                <p className="text-zinc-500 text-xs mb-1">P&L total</p>
                 <p className={`text-2xl font-bold ${totalPnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                   {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(2)} u
                 </p>
-                <p className="text-xs text-gray-600 mt-0.5">unités (mise 1u / pari)</p>
+                <p className="text-xs text-zinc-600 mt-0.5">unités (mise 1u / pari)</p>
               </div>
             </div>
 
             {/* ROI Chart */}
             {chartData.length >= 2 && (
-              <div className="bg-white/3 border border-white/8 rounded-xl p-6 mb-8">
-                <h2 className="text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">ROI cumulé</h2>
+              <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-8">
+                <h2 className="text-sm font-semibold text-zinc-300 mb-4 uppercase tracking-wider">ROI cumulé</h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -280,21 +360,97 @@ export default function HistoriquePage() {
               </div>
             )}
 
+            {/* Bankroll Simulation */}
+            {bankrollData.length >= 2 && (
+              <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-8">
+                <h2 className="text-sm font-semibold text-zinc-300 mb-1 uppercase tracking-wider">
+                  Simulation de bankroll
+                </h2>
+                <p className="text-zinc-600 text-xs mb-4">
+                  Capital de départ : 1 000 € — Mise fixe : 10 € par pari (1%)
+                </p>
+
+                {/* Bankroll stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                  <div className="bg-white/5 rounded-lg px-3 py-2.5">
+                    <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Capital initial</p>
+                    <p className="text-white font-bold text-lg">1 000 €</p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg px-3 py-2.5">
+                    <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Capital final</p>
+                    <p className={`font-bold text-lg ${finalBankroll >= STARTING_BANKROLL ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {finalBankroll.toLocaleString('fr-FR')} €
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg px-3 py-2.5">
+                    <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Profit net</p>
+                    <p className={`font-bold text-lg ${totalProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {totalProfit >= 0 ? '+' : ''}{totalProfit.toLocaleString('fr-FR')} €
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg px-3 py-2.5">
+                    <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Rendement</p>
+                    <p className={`font-bold text-lg ${bankrollROI >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {bankrollROI >= 0 ? '+' : ''}{bankrollROI.toFixed(0)}%
+                    </p>
+                    <p className="text-zinc-600 text-[10px]">Drawdown max : {maxDrawdown.toFixed(1)}%</p>
+                  </div>
+                </div>
+
+                {/* Bankroll chart */}
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={bankrollData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="bankrollGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#34d399" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#34d399" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fill: '#6b7280', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis
+                      tick={{ fill: '#6b7280', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={v => `${(v / 1000).toFixed(1)}k€`}
+                    />
+                    <Tooltip content={<BankrollTooltip />} />
+                    <ReferenceLine y={STARTING_BANKROLL} stroke="rgba(255,255,255,0.15)" strokeDasharray="4 4" label={{ value: 'Départ', fill: '#6b7280', fontSize: 10 }} />
+                    <Area
+                      type="monotone"
+                      dataKey="bankroll"
+                      stroke="#34d399"
+                      strokeWidth={2}
+                      fill="url(#bankrollGrad)"
+                      dot={false}
+                      activeDot={{ r: 4, fill: '#34d399' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
             {/* Filters */}
             <div className="flex flex-wrap gap-2 mb-4">
               {/* Result filter */}
-              <div className="flex rounded-lg overflow-hidden border border-white/8 text-xs">
-                {(['all', 'won', 'lost', 'pending'] as const).map(f => (
+              <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs">
+                {(['all', 'won', 'lost'] as const).map(f => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
                     className={`px-3 py-1.5 transition ${
                       filter === f
                         ? 'bg-violet-600 text-white'
-                        : 'bg-white/3 text-gray-400 hover:text-white'
+                        : 'bg-black/40 text-zinc-400 hover:text-white'
                     }`}
                   >
-                    {f === 'all' ? 'Tous' : f === 'won' ? 'Gagnés' : f === 'lost' ? 'Perdus' : 'En attente'}
+                    {f === 'all' ? 'Tous' : f === 'won' ? 'Gagnés' : 'Perdus'}
                   </button>
                 ))}
               </div>
@@ -304,7 +460,7 @@ export default function HistoriquePage() {
                 <select
                   value={leagueFilter}
                   onChange={e => setLeagueFilter(e.target.value)}
-                  className="bg-white/3 border border-white/8 text-gray-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none"
+                  className="bg-black/40 border border-white/10 text-zinc-400 text-xs rounded-lg px-3 py-1.5 focus:outline-none"
                 >
                   <option value="all">Toutes les ligues</option>
                   {leagues.map(l => (
@@ -315,10 +471,10 @@ export default function HistoriquePage() {
             </div>
 
             {/* Table */}
-            <div className="bg-white/3 border border-white/8 rounded-xl overflow-hidden">
+            <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/5 text-xs text-gray-500 uppercase tracking-wider">
+                  <tr className="border-b border-white/5 text-xs text-zinc-500 uppercase tracking-wider">
                     <th className="text-left px-4 py-3 font-medium">Date</th>
                     <th className="text-left px-4 py-3 font-medium">Match</th>
                     <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Ligue</th>
@@ -332,30 +488,30 @@ export default function HistoriquePage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filtered.map((h, i) => (
-                    <tr key={h.id ?? i} className="hover:bg-white/2 transition">
-                      <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                    <tr key={h.id ?? i} className="hover:bg-white/5 transition">
+                      <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">
                         {formatDate(h.date)}
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-white font-medium">{h.home_team}</span>
-                        <span className="text-gray-600 mx-1">vs</span>
+                        <span className="text-zinc-600 mx-1">vs</span>
                         <span className="text-white font-medium">{h.away_team}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs hidden sm:table-cell">{h.league}</td>
+                      <td className="px-4 py-3 text-zinc-500 text-xs hidden sm:table-cell">{h.league}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-gray-300 text-xs">{formatBet(h.recommended_bet)}</span>
+                          <span className="text-zinc-300 text-xs">{formatBet(h.recommended_bet)}</span>
                           {h.confidence_badge && (
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono ${BADGE_COLORS[h.confidence_badge] ?? 'text-gray-500 bg-white/5 border-white/10'}`}>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono ${BADGE_COLORS[h.confidence_badge] ?? 'text-zinc-500 bg-white/5 border-white/10'}`}>
                               {h.confidence_badge}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-500 text-xs hidden md:table-cell">
+                      <td className="px-4 py-3 text-right text-zinc-500 text-xs hidden md:table-cell">
                         {formatProb(h.model_prob)}
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-300 text-xs hidden md:table-cell">
+                      <td className="px-4 py-3 text-right text-zinc-300 text-xs hidden md:table-cell">
                         {h.odds != null ? h.odds.toFixed(2) : '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -364,12 +520,12 @@ export default function HistoriquePage() {
                             {h.home_score} – {h.away_score}
                           </span>
                         ) : (
-                          <span className="text-gray-600 text-xs">—</span>
+                          <span className="text-zinc-600 text-xs">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {!h.resolved ? (
-                          <span className="text-gray-600 text-xs">En attente</span>
+                          <span className="text-zinc-600 text-xs">En attente</span>
                         ) : h.won === true ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
                             ✓ Gagné
@@ -390,14 +546,14 @@ export default function HistoriquePage() {
                             {h.pnl > 0 ? '+' : ''}{h.pnl.toFixed(2)}u
                           </span>
                         ) : (
-                          <span className="text-gray-600 text-xs">—</span>
+                          <span className="text-zinc-600 text-xs">—</span>
                         )}
                       </td>
                     </tr>
                   ))}
                   {filtered.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="px-4 py-8 text-center text-gray-600 text-sm">
+                      <td colSpan={9} className="px-4 py-8 text-center text-zinc-600 text-sm">
                         Aucun résultat pour ce filtre
                       </td>
                     </tr>
@@ -407,9 +563,9 @@ export default function HistoriquePage() {
             </div>
 
             {/* Script tip */}
-            <p className="text-center text-gray-700 text-xs mt-6">
+            <p className="text-center text-zinc-700 text-xs mt-6">
               Mise à jour automatique via{' '}
-              <code className="bg-white/5 px-1.5 py-0.5 rounded text-gray-500">python scripts/fetch_results.py</code>
+              <code className="bg-white/5 px-1.5 py-0.5 rounded text-zinc-500">python scripts/fetch_results.py</code>
             </p>
           </>
         )}

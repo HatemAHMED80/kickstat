@@ -20,6 +20,7 @@ from loguru import logger
 class TeamRating:
     attack: float = 1.0
     defense: float = 1.0
+    home_adv: float = 0.25
 
 
 @dataclass
@@ -181,53 +182,101 @@ class DixonColesModel:
             f"{n_teams} teams, avg_goals={self.avg_goals:.3f}"
         )
 
-        # Parameter vector: [attack_0..n, defense_0..n, home_adv, rho]
-        n_params = 2 * n_teams + 2
+        # Pre-compute match data as NumPy arrays for vectorized likelihood
+        n_matches = len(matches)
+        hi_arr = np.array([team_idx[m.home_team] for m in matches], dtype=np.int32)
+        ai_arr = np.array([team_idx[m.away_team] for m in matches], dtype=np.int32)
+        hg_arr = np.array([m.home_goals for m in matches], dtype=np.int32)
+        ag_arr = np.array([m.away_goals for m in matches], dtype=np.int32)
+        w_arr = np.array([m.weight for m in matches], dtype=np.float64)
+
+        # Pre-compute log-factorial for Poisson PMF: log(k!) for k=0..max_goals
+        max_g = max(int(hg_arr.max()), int(ag_arr.max())) + 1
+        log_fact = np.zeros(max_g + 1)
+        for k in range(2, max_g + 1):
+            log_fact[k] = log_fact[k - 1] + np.log(k)
+        hg_logfact = log_fact[hg_arr]
+        ag_logfact = log_fact[ag_arr]
+
+        # Pre-compute tau category masks
+        mask_00 = (hg_arr == 0) & (ag_arr == 0)
+        mask_01 = (hg_arr == 0) & (ag_arr == 1)
+        mask_10 = (hg_arr == 1) & (ag_arr == 0)
+        mask_11 = (hg_arr == 1) & (ag_arr == 1)
+
+        # Parameter vector: [attack_0..n, defense_0..n, home_adv_0..n, rho]
+        n_params = 3 * n_teams + 1
         x0 = np.ones(n_params)
-        x0[-2] = self.home_advantage_init
-        x0[-1] = self.rho_init
+        x0[2 * n_teams : 3 * n_teams] = self.home_advantage_init
+
+        # Warm-start: use previous solution if teams match
+        if self.is_fitted and self.teams:
+            for i, name in enumerate(team_names):
+                if name in self.teams:
+                    prev = self.teams[name]
+                    x0[i] = prev.attack
+                    x0[n_teams + i] = prev.defense
+                    x0[2 * n_teams + i] = prev.home_adv
+            x0[-1] = self.rho
+
+        x0[-1] = max(min(x0[-1], 0.0), -0.3)  # clip rho to bounds
+
+        # Regularization strength for per-team home_adv
+        home_adv_reg = 2.0
 
         # Bounds
         bounds = (
-            [(0.2, 3.0)] * n_teams      # attacks
-            + [(0.2, 3.0)] * n_teams     # defenses
-            + [(0.10, 0.45)]             # home advantage (min 0.10 - always exists in football)
-            + [(-0.3, 0.0)]              # rho
+            [(0.2, 3.0)] * n_teams
+            + [(0.2, 3.0)] * n_teams
+            + [(0.0, 0.60)] * n_teams
+            + [(-0.3, 0.0)]
         )
+
+        avg_goals = self.avg_goals  # local ref for speed
 
         def neg_log_likelihood(params):
             attacks = params[:n_teams]
             defenses = params[n_teams : 2 * n_teams]
-            home_adv = params[-2]
+            home_advs = params[2 * n_teams : 3 * n_teams]
             rho = params[-1]
 
             # Normalize: mean attack = 1, mean defense = 1
             attacks = attacks / attacks.mean()
             defenses = defenses / defenses.mean()
 
-            log_lik = 0.0
-            for m in matches:
-                hi = team_idx[m.home_team]
-                ai = team_idx[m.away_team]
+            # Vectorized lambda computation
+            lambda_h = np.maximum(
+                avg_goals * attacks[hi_arr] * defenses[ai_arr] * (1 + home_advs[hi_arr]),
+                0.05,
+            )
+            lambda_a = np.maximum(
+                avg_goals * attacks[ai_arr] * defenses[hi_arr],
+                0.05,
+            )
 
-                lambda_h = max(
-                    self.avg_goals * attacks[hi] * defenses[ai] * (1 + home_adv),
-                    0.05,
-                )
-                lambda_a = max(
-                    self.avg_goals * attacks[ai] * defenses[hi],
-                    0.05,
-                )
+            # Vectorized log-Poisson: log(e^-lam * lam^k / k!) = -lam + k*log(lam) - log(k!)
+            log_poiss_h = -lambda_h + hg_arr * np.log(lambda_h) - hg_logfact
+            log_poiss_a = -lambda_a + ag_arr * np.log(lambda_a) - ag_logfact
 
-                prob = self._score_prob(
-                    m.home_goals, m.away_goals, lambda_h, lambda_a, rho
-                )
-                if prob > 1e-10:
-                    log_lik += m.weight * np.log(prob)
-                else:
-                    log_lik += m.weight * np.log(1e-10)
+            # Vectorized tau correction
+            log_tau = np.zeros(n_matches)
+            if rho != 0.0:
+                tau_vals = np.ones(n_matches)
+                tau_vals[mask_00] = 1 - lambda_h[mask_00] * lambda_a[mask_00] * rho
+                tau_vals[mask_01] = 1 + lambda_h[mask_01] * rho
+                tau_vals[mask_10] = 1 + lambda_a[mask_10] * rho
+                tau_vals[mask_11] = 1 - rho
+                log_tau = np.log(np.maximum(tau_vals, 1e-10))
 
-            return -log_lik
+            # Total log-likelihood
+            log_probs = log_poiss_h + log_poiss_a + log_tau
+            log_lik = np.sum(w_arr * log_probs)
+
+            # Ridge regularization on home_adv
+            mean_ha = home_advs.mean()
+            reg_penalty = home_adv_reg * np.sum((home_advs - mean_ha) ** 2)
+
+            return -log_lik + reg_penalty
 
         result = minimize(
             neg_log_likelihood,
@@ -247,19 +296,27 @@ class DixonColesModel:
         # Extract fitted parameters
         attacks = result.x[:n_teams]
         defenses = result.x[n_teams : 2 * n_teams]
+        home_advs = result.x[2 * n_teams : 3 * n_teams]
         attacks = attacks / attacks.mean()
         defenses = defenses / defenses.mean()
 
         self.teams = {
-            name: TeamRating(attack=float(attacks[i]), defense=float(defenses[i]))
+            name: TeamRating(
+                attack=float(attacks[i]),
+                defense=float(defenses[i]),
+                home_adv=float(home_advs[i]),
+            )
             for i, name in enumerate(team_names)
         }
-        self.home_advantage = float(result.x[-2])
+        self.home_advantage = float(home_advs.mean())  # store mean for compatibility
         self.rho = float(result.x[-1])
         self.is_fitted = True
 
+        ha_min = float(home_advs.min())
+        ha_max = float(home_advs.max())
         logger.info(
-            f"Fitted: home_adv={self.home_advantage:.3f}, rho={self.rho:.3f}, "
+            f"Fitted: home_adv={self.home_advantage:.3f} "
+            f"(range {ha_min:.3f}-{ha_max:.3f}), rho={self.rho:.3f}, "
             f"teams={n_teams}"
         )
         return self
@@ -269,8 +326,8 @@ class DixonColesModel:
 
         Falls back to average ratings for unknown teams.
         """
-        home_r = self.teams.get(home_team, TeamRating())
-        away_r = self.teams.get(away_team, TeamRating())
+        home_r = self.teams.get(home_team, TeamRating(home_adv=self.home_advantage))
+        away_r = self.teams.get(away_team, TeamRating(home_adv=self.home_advantage))
 
         if home_team not in self.teams:
             logger.warning(f"Unknown team '{home_team}', using default ratings")
@@ -278,7 +335,7 @@ class DixonColesModel:
             logger.warning(f"Unknown team '{away_team}', using default ratings")
 
         lambda_h = max(
-            self.avg_goals * home_r.attack * away_r.defense * (1 + self.home_advantage),
+            self.avg_goals * home_r.attack * away_r.defense * (1 + home_r.home_adv),
             0.05,
         )
         lambda_a = max(
